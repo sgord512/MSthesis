@@ -1,1 +1,171 @@
-Here's an introduction.
+\section{Introduction}
+
+The complexity class \TFNP, which stands for total function problems in
+\NP, contains search problems that are guaranteed to have a solution, and whose
+solutions can be verified in polynomial time~\cite{megiddo1991total}.
+%
+While \TFNP is a semantically defined complexity class and is thus unlikely to
+contain complete problems, a number of syntactically defined subclasses of
+\TFNP have proven very successful at capturing the complexity of total search 
+problems.
+% PPAD
+For example, the complexity class $\cc{PPAD}$, introduced in
+\cite{papadimitriou1994complexity} to capture the difficulty of search problems
+that are guaranteed total by a parity argument, attracted intense attention in
+the past decade culminating in a series of papers showing that the problem of
+computing a Nash-equilibrium in two-player games is $\cc{PPAD}$-complete
+\cite{chen2009settling,daskalakis2009complexity}. There are no known
+polynomial-time algorithms for $\cc{PPAD}$-complete problems, and recent work
+suggests that no such algorithms are likely to exist~\cite{bitansky2015cryptographic,garg2016revisiting}. 
+% PLS
+The class of problems that
+can be solved by local search (in perhaps exponentially-many steps), $\cc{PLS}$,
+has also attracted much interest since it was introduced in
+\cite{johnson1988easy}, and looks similarly unlikely to have polynomial-time
+algorithms. Examples of problems that are complete for \PLS include the problem
+of computing a pure Nash equilibrium in a congestion
+game~\cite{fabrikant2004complexity} and computing a locally optimal max
+cut~\cite{schaffer1991simple}.
+
+% Now CLS
+If a problem lies in both \PPAD and \PLS then it is unlikely to be complete for 
+either class, since this would imply a extremely surprising containment of one class in the other.
+Motivated by the existence of several total function problems in \PPADPLS
+that have resisted researchers attempts to design polynomial-time algorithms,
+in their 2011 paper \cite{daskalakis2011continuous}, Daskalakis and Papadimitriou introduced
+the class $\CLS$, a syntactically defined subclass of $\cc{PPAD} \cap \cc{PLS}$.
+\CLS is intended to capture the class of optimization problems over a continuous
+domain in which a continuous potential function is being minimized and the
+optimization algorithm has access to an continuous improvement function.
+Daskalakis and Papadimitriou showed that many classical problems of unknown
+complexity were shown to be in $\CLS$ including the problem of solving a simple
+stochastic game, the more general problem of solving a Linear Complementarity
+Problem with a P-matrix, and the problem of finding an approximate fixpoint
+to a contraction map. Moreover, $\CLS$ is the smallest known subclass of
+$\cc{TFNP}$ and hardness results for it imply hardness results for
+$\cc{PPAD}$ and $\cc{PLS}$ simultaneously. 
+
+%However, the original paper 
+%of Daskalkakis and Papadimitriou did not prove that any natural problem was
+%\CLS-complete.
+%prove that any of the problems that 
+%they showed to be in \CLS were hard for it.
+
+Recent work by Hub\'{a}\v{c}ek and Yogev~\cite{hubavcek2017hardness} proved 
+lower bounds for \CLS. They introduced
+a problem known as $\EOML$ which they showed was in $\CLS$, and for which they
+proved a query complexity lower bound of $\Omega(2^{n/2}/\sqrt{n})$ and
+hardness under the assumption that there were one-way permutations and
+indinstinguishability obfuscators for problems in $\cc{P_{/poly}}$.
+%
+Another recent result showed that the search version of the Colorful
+Carath\'eodory Theorem is in $\cc{PPAD} \cap \cc{PLS}$, and left open
+whether the problem is also in $\CLS$~\cite{colorfulcara2017}.
+
+Unfortunately \CLS is not particularly well-understood, and a glaring
+deficiency is the current lack of any complete problem for the class. In their
+original paper, Daskalakis and Papadimitriou suggested two natural candidates
+for complete problems for \CLS, \ContractionMap and \PLCP, and this remains an
+open problem.
+Another motivation for studying these two problems is that the problems of
+solving Condon's simple stochastic games can be reduced to each of them
+(separately) in polynomial time
+and, in turn, there is sequence of polynomial-time reductions from parity games 
+to mean-payoff games to discounted games to simple stochastic 
+games~\cite{puri1996theory,gartner2005simple,jurdzinski2008simple,zwick1996complexity,hansen2013complexity}.
+The complexity of solving these problems is unresolved and has received 
+much attention over many years~(see, for example, 
+\cite{zwick1996complexity,condon1992complexity,fearnley2010linear,jurdzinski1998deciding,bjorklund2004combinatorial,fearnley2016complexity}).
+In a recent breakthrough, a quasi-polynomial time algorithm for parity games
+was presented~\cite{parity}.
+For mean-payoff, discounted, and simple stochastic games, the best-known 
+algorithms run in subexponential time~\cite{ludwig1995subexponential}.
+The existence of a polynomial time algorithm for solving any of these games
+would be a major breakthrough.
+For \ContractionMap and \PLCP no subexponential time algorithms 
+are known, and providing such algorithms would be a major breakthrough.
+As the most general of these problems, and thus most likely to be 
+\CLS-hard, we study \ContractionMap and \PLCP.
+
+\noindent
+\textbf{Our contribution.}
+We make progress towards settling the complexity of both of these problems. In
+the problem $\ContractionMap$, as defined in~\cite{daskalakis2011continuous}, we
+are asked to find an approximate fixed point of a function $f$ that is purported
+to contracting with respect to a metric induced by a norm (where the choice of
+norm does not matter but is not part of the input), or to give a violation of
+the contraction property for $f$. We introduce a problem, \MMCM, that allows
+the specification of a purpoted meta-metric $d$ as part of the input of the problem,
+along with the function $f$. We are asked to either find an approximate fixed
+point of~$f$, a violation of the contraction property for~$f$ with respect to
+$d$, a violation of the Lipschitz continuity of $f$ or $d$, or a witness that $d$ violates 
+the meta-metric properties.
+We show that \MMCM is \CLS-complete, thus identifying a first natural \CLS-complete problem.
+We note that, contemporaneously and independently of our work, Daskalakis, Tzamos, and
+Zampetakis~\cite{DTZ17} have defined the problem \MBanach and shown it is in \CLS-complete.
+Their \CLS-hardness reduction produces a metric and 
+is thus stronger than our \CLS-hardness result for \MMCM. 
+We discuss both results in more detail in Section~\ref{sec:MMCMisCLScomplete}.
+
+Our second result is to show that \PLCP can be reduced to \EOML.
+The \EOML problem was introduced to capture problems that have a PPAD directed
+path structure while that also allow us to keep count of exactly how far the vertex is from
+the start of the path. In a sense, this may seem rather unnatural, as many common
+problems do not seem to have this property. In particular, while the \PLCP problem
+has a natural measure of progress towards a solution given by Lemke's algorithm, 
+this is given in the form of a potential function, rather than an exact measure
+of the number of steps from the beginning of the algorithm.
+
+To address this, we introduce a new problem \EOPL which captures problems with a
+PPAD path structure that also allow have a potential function that decreases
+along this path. It is straightforward to show that \EOPL is more general than
+\EOML. However, despite its generality, we are also able to show that \EOPL can
+be reduced to \EOML in polynomial time, and so the two problems are equivalent
+under polynomial time reductions.  We show that \PLCP can be reduced to \EOPL,
+which provides an alternative proof that $\PLCP$ is in $\CLS$.
+
+We believe that the \EOPL problem is of independent interest, as it naturally
+unifies the circuit-based view of $\cc{PPAD}$ and of $\cc{PLS}$, and is defined
+in the spirit of the canonical definitions of $\cc{PPAD}$ and $\cc{PLS}$.  There
+are two obvious lines for further research.  Given the reduction we provide,
+\EOPL and \EOML, are more likely candidates for $\CLS$-hardness than $\PLCP$. 
+Alternatively, one could attempt to reduce \EOPL to \PLCP, thereby showing that
+that \PLCP is complete for the complexity class defined by these two problems,
+and in doing so finally resolve the long-standing open problem of the complexity
+of \PLCP.
+We note that, in the case of finding a Nash equilibrium of a two-player game,
+which we now know is
+\PPAD-complete~\cite{chen2009settling,daskalakis2009complexity}, the definition
+of \PPAD was inspired by the path structure of the Lemke-Howson algorithm, as
+our definition of \EOPL is directly inspired by the path structure of Lemke
+paths for P-matrix LCPs.
+
+%, and two-player Nash equilibrium problem motivated PPAD class which eventually ended up capturing its exact complexity.}
+%We leave the problem of showing that \EOPL (and thus \EOML) are
+%$\CLS$-hard as an open problem. 
+
+%essentially keep count of how far the vertex is from start of
+%the path in terms of its potential. Thus, potential has to change by exactly one
+%from one to the next vertex. While, PLS allows arbitrary change in potential,
+%thus motivation to introduce EOPL. 
+
+%Since EOPL is meant to generalize EOML, it is not a great surprise that EOML
+%reduces to EOPL. However despite its generality, EOPL can be eventually reduced
+%to EOML. 
+
+%Lemke-Howson complementary path was the motivation for defining PPAD and
+%eventually we could show that 2-Nash is PPAD-hard as well. Simlarly, for PLCP
+%Lemke's complementary path are monotonic, and thereby gives EOPL structure. This
+%gives hope that EOPL is may be a right problem to capture exact complexity of
+%PLCP. 
+
+%We also show that \PLCP can be reduced to a new problem \EOPL.
+%The definition of \EOPL is extremely natural.
+%We show that \EOML and \EOPL are polynomial-time equivalent.
+
+%\noindent
+%\textbf{Outline.}
+%In Section~\ref{sec:MMCMisCLScomplete}, we show that \MMCM is \CLS-complete.  In
+%Section~\ref{sec:EOMLtoEOPL}, we reduce \EOML to \EOPL and back, thereby showing
+%that \EOPL is in \CLS.  Finally, in Section~\ref{sec:PLCPtoEOPL} we reduce \PLCP
+%to \EOPL.

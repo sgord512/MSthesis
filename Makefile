@@ -1,10 +1,7 @@
 .PHONY: clean all
 
 all:
-	pdflatex thesis
-	bibtex thesis
-	pdflatex thesis
-	pdflatex thesis
-
+	./latexrun thesis.tex
 clean:
 	rm -r *.aux *.log *.lof *.lot *.toc *.pdf
+	./latexrun --clean-all
