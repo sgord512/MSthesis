@@ -1,6 +1,7 @@
 *.aux
 *.log
-*.pdf
+paper.pdf
+thesis.pdf
 *.tex~
 *.toc
 *.lof
@@ -8,3 +9,4 @@
 *.*~
 Makefile~
 latex.out
+.#*
