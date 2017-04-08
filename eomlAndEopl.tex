@@ -1,0 +1,96 @@
+\chapter{\EOML to \EOPL and Back}
+\label{sec:EOMLtoEOPL}
+
+In this section, we define a new problem \EOPL.
+Then, we design polynomial-time reductions from \EOML to \EOPL, and
+from \EOPL to \EOML, thereby showing that the two problems 
+are polynomial-time equivalent. In Section~\ref{sec:PLCPtoEOPL},
+we reduce \PLCP to \EOPL.
+
+First we recall the definition of \EOML, which was
+first defined in~\cite{hubavcek2017hardness}.
+It is close in spirit to the problem \EOL that is used
+to define \PPAD~\cite{papadimitriou1994complexity}. 
+
+\begin{definition}[\EOML~\cite{hubavcek2017hardness}]
+Given circuits $S,P: \{0,1\}^n \rightarrow \{0,1\}^n$, and $V:\{0,1\}^n\rightarrow \{0,\dots, 2^n\}$ such that $P(0^n) =0^n\neq S(0^n)$ and $V(0^n)=1$, find a string $\xx \in \{0,1\}^n$ satisfying one of the following 
+\begin{enumerate}[label=(T\arabic*)]
+\item either $S(P(\xx))\neq \xx \neq 0^n$ or $P(S(\xx))\neq \xx$,
+\item $\xx\neq 0^n, V(\xx)=1$,
+\item either $V(\xx)>0$ and $V(S(\xx))-V(\xx)\neq 1$, or $V(\xx)>1$ and $V(\xx)-V(P(\xx))\neq 1$. 
+\end{enumerate}
+\end{definition}
+Intuitively, an \EOML is an \EOL instance that is also equipped with an
+``odometer'' function. The circuits $P$ and $S$ implicitly define an
+exponentially large graph in which each vertex has degree at most 2, just as in \EOL, and condition T1 says that the end of
+every line (other than $0^n$) is a solution.
+In particular, the string 
+$0^n$ is guaranteed to be the end of a line, and so a solution can be found by
+following the line that starts at $0^n$.
+ The function $V$ is intended to help with this, by giving the number of steps
+that a given string is from the start of the line. We have that $V(0^n) = 1$,
+and that $V$ increases by exactly 1 for each step we make along the line.
+Conditions T2 and T3 enforce this by saying that any violation of the property
+is also a solution to the problem. 
+
+
+In \EOML, the requirement of incrementing $V$ by exactly one as walk along the
+line is quite restrictive. We define a new problem, \EOPL,  which is similar in
+spirit to \EOL, but drops the requirement of always incrementing the potential
+by one as we move along the line.
+
+\begin{definition}[\EOPL]
+\label{def:EOPL}
+Given Boolean circuits $S,P : \Set{0,1}^n \to \Set{0,1}^n$ such that $P(0^n) =0^n\neq S(0^n)$ and a Boolean circuit $V: \Set{0,1}^n \to \Set{0,1,\dotsc,2^m - 1}$ such that $V(0^n) = 0$ find one of the following:
+\begin{enumerate}[label=(R\arabic*)]
+\item A point $x \in \Set{0,1}^n$ such that $S(P(x)) \neq x \neq 0^n$ or $P(S(x)) \neq x$.
+\item A point $x \in \Set{0,1}^n$ such that $x \neq S(x)$, $P(S(x)) = x$, and $V(S(x)) - V(x) \leq 0$.
+\end{enumerate}
+\end{definition}
+
+The key difference here is that the function $V$ is required to be strictly
+monotonically increasing as we walk along the line, but the amount that it
+increases in each step is not specified.
+At first glance, the definition of \EOPL may seem more general and more likely to 
+capture the whole class \CLS. In fact, we will show that \EOML and \EOPL are 
+inter-reducible in polynomial-time.
+%
+\begin{theorem}
+\EOML and \EOPL are equivalent under polynomial-time reductions.
+\end{theorem}
+%
+As expected, the reduction from~\EOML to \EOPL is relatively easy. It requires
+handling the difference in potential at $0^n$ and vertices with potential zero that
+are not discarded directly as possible solutions in \EOPL. We make the latter
+self loops, but that creates extra starts and ends of lines which need to be
+handled. Full details of the reduction with proofs are in
+Appendix~\ref{sec:EOMLtoEOPL}.
+
+The reduction from \EOPL to \EOML is involved, and appears in detail in
+Appendix~\ref{sec:eopl2eoml}. Here the basic idea is to insert missing single
+increments in between by introducing new vertices along the original edges. To
+allow this we need to encode potential itself in the vertex description. If
+there is an edge from $\uu$ to $\uu'$ in the \EOPL instance whose respective
+potentials are $p$ and $p'$ such that say $p<p'$ then we create edges $(u,p)\ra
+(u,p+1)\ra \dots \ra (u,p'-1)\ra (u,p')$. However, this creates a lot of dummy
+vertices, namely those that never appear on any edge due to irrelevant potential
+values, i.e., in this example $(u,\pi)$ with $\pi <p$ or $\pi\ge p'$. We make
+them self loops (not an end-of-line) with zero potential, and since
+non-end-of-line solutions of \EOML, namely $T2$ and $T3$, must have strictly
+positive potential, these will never create a solution of the \EOML instance.
+
+In addition, a number of issues need to be handled with consistency: $(a)$
+a $T2$ type solution of \EOML may be neither at the end of any line nor be a 
+potential violation in \EOPL; we do extra (linear time) work to handle such
+solutions, $(b)$ a $T3$ type potential violation may not be on a ``valid'' edge as
+required by \EOPL. $(c)$ ``invalid'' edges, $(d)$ potential difference at the
+initial vertex $0^n$, etc.
+
+% we make these dummy solutions self loops (non-end-of-line) with zero potential.} 
+
+%which we handle by creating self loops and assigning zero potential. The fact that non-end-of-line solutions of \EOML, namely $T1$ and $T2$, must have strictly postive potential ensures no extra . }
+
+%The easier and expected reduction is from~\EOML to \EOPL. There are some details 
+%around the start and ends of the line. For \EOPL to \EOML, the basic idea is to
+%insert missing single increments in between. Both reductions appear with all details 
+%in Appendices~\ref{sec:EOMLtoEOPL} and~\ref{sec:eopl2eoml}, respectively.

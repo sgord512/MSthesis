@@ -1,0 +1,51 @@
+\chapter{Preliminaries}
+
+In this section, we define polynomial-time reductions between total search problems
+and the complexity class \CLS.
+%
+\begin{definition}
+For total functions problems, a (polynomial-time) reduction from problem~$A$ to
+problem $B$ is a pair of polynomial-time functions $(f,g)$, such that $f$ 
+maps an instance $x$ of $A$ to an instance $f(x)$ of $B$, and $g$ maps
+any solution $y$ of $f(x)$ to a solution $g(y)$ of $x$.
+\end{definition}
+%
+Following~\cite{daskalakis2011continuous}, we define the complexity class $\CLS$
+as the class of problems that are reducible to the following problem \CLO.
+
+\begin{definition}[\CLO~\cite{daskalakis2011continuous}]
+\label{def:CLO}
+Given two arithmetic circuits computing functions $f : [0,1]^3\to [0,1]^3$ and $p :
+[0,1]^3 \to [0,1]$ and parameters $\e, \lambda > 0$, find either:
+\begin{enumerate}[leftmargin=*,label=(C\arabic*)]
+\item a point $x\in [0,1]^3$ such that $p(x) \leq p(f(x)) - \e$ or \label{c_fixpoint}
+\item a pair of points $x,y\in [0,1]^3$ satisfying either \label{c_violation}
+  \begin{enumerate}[label=(C\arabic{enumi}\alph*)] 
+  \item $\Norm{f(x) - f(y)} > \lambda \Norm{x-y}$ or \label{c_bad_f}
+  \item $\Norm{p(x) - p(y)} > \lambda \Norm{x-y}$. \label{c_bad_p}
+  \end{enumerate}
+\end{enumerate}
+\end{definition}
+
+In Definition~\ref{def:CLO}, $p$ should be thought of as a \emph{potential}
+function, and $f$ as a \emph{neighbourhood} function that gives a candidate
+solution with better potential if one exists. Both of these functions are 
+purported to be Lipschitz continuous. A solution to the problem is either an approximate
+potential minimizer or a witness for a violation of Lipschitz continuity.
+
+\begin{definition}[\CM~\cite{daskalakis2011continuous}]
+We are given as input an arithmetic circuit computing $f: [0,1]^3\to [0,1]^3$,
+a choice of norm $\Norm{\cdot}$, constants \mbox{$\e,c \in (0,1)$},
+and $\delta > 0$, and we are promised that $f$ is $c$-contracting w.r.t. $\Norm{\cdot}$.
+The goal is to find
+\begin{enumerate}[label=(CM\arabic*)]
+\item a point $x\in [0,1]^3$ such that $d(f(x),x) \leq \delta$, 
+\item or two points $x,y\in [0,1]^3$ such that $\Norm{f(x) - f(y)}/\Norm{x-y} > c$. 
+\end{enumerate}
+\end{definition}
+
+In other words, the problem asks either for an approximate fixed point of $f$ or
+a violation of contraction. As shown in~\cite{daskalakis2011continuous}, \CM is
+easily seen to be in \CLS by creating instances of \CLO with $p(x) =
+\Norm{f(x)-x}$, $f$ remains as $f$, Lipschitz constant $\lambda = c+1$, and $\epsilon =
+(1-c)\delta$.

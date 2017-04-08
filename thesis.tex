@@ -1,4 +1,4 @@
-\documentclass[draftthesis,tocnosub,noragright,centerchapter,12pt]{uiucecethesis09}
+\documentclass[draftthesis,tocnosub,noragright,centerchapter,12pt,mixcasechap]{uiucecethesis09}
 
 \usepackage{multirow,stmaryrd}
 \usepackage{comment,amsfonts}
@@ -37,11 +37,8 @@
 \newtheorem{example}[theorem]{Example}
 \newtheorem{observation}[theorem]{Observation}
 
-
 \usepackage{cite}
-
-\usepackage[disable]{todonotes}
-
+\usepackage{todonotes}
 \usepackage{microtype}%if unwanted, comment out or use option "draft"
 
 %\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
@@ -73,15 +70,34 @@
 \def\GCM{\problem{GeneralContraction}\xspace}
 \def\MMCM{\problem{MetametricContraction}\xspace}
 \def\PMMCM{\problem{PromiseMetametricContraction}\xspace}
-\def\EOL{\problem{EndOfLine}\xspace}
+\def\EOL{\problem{EndOfALine}\xspace}
 \def\EOPL{\problem{EndOfPotentialLine}\xspace}
 \def\EOML{\problem{EndOfMeteredLine}\xspace}
 \def\CLO{\problem{ContinuousLocalOpt}\xspace}
 \def\TwoDDLO{\problem{2D-DiscreteLocalOpt}\xspace}
 \def\PLCP{\problem{P-LCP}\xspace}
-\def\ContractionMap{\problem{ContractionMap}\xspace}
 \def\MBanach{\problem{MetricBanach}\xspace}
+\def\ContractionMap{\problem{ContractionMap}\xspace}
+\def\ThreeDContractionMap{\problem{3DContractionMap}\xspace}
+\def\TwoDContractionMap{\problem{2DContractionMap}\xspace}
+\def\DiscreteBrouwer{\problem{DiscreteBrouwer}\xspace}
+
 \def\e{\epsilon}
+\def\bx{\mathbf{x}}
+\def\grad{\nabla}
+\def\del{\partial}
+\def\Succ{\mathbf{S}}
+\def\Pred{\mathbf{P}}
+\def\Value{\mathbf{V}}
+\def\mycolor{\operatorname{color}}
+\def\Yellow{\textsc{Yellow}}
+\def\Red{\textsc{Red}}
+\def\Blue{\textsc{Blue}}
+
+\def\IfB{\textbf{If}\xspace}
+\def\ElseB{\textbf{Else}\xspace}
+\def\ReturnB{\textbf{Return}\xspace}
+\def\ElseIfB{\textbf{Else if}\xspace}
 
 \def\ite{\mbox{ItoE}}
 \def\eti{\mbox{EtoI}}
@@ -323,7 +339,8 @@ Dedicated to my parents and sisters.
 
 \mainmatter
 
-
+\chapter{Todo}
+Here's where I'm going to put all the things I need to do.
 \todo{Merge the appendices back into the main matter.}
 
 
@@ -331,7 +348,11 @@ Dedicated to my parents and sisters.
 % INSERT REAL CONTENT HERE
 %
 \include{intro}	% for INTRODUCTION in "intro.tex"
-\include{paper}
+\include{preliminaries}
+\include{mmcmCompleteness}
+\include{eomlAndEopl}
+\include{plcpToEopl}
+\include{twoDContractionMapToEopl}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % APPENDIX

@@ -1,0 +1,156 @@
+\chapter{\MMCM Is CLS-Complete}
+\label{sec:MMCMisCLScomplete}
+
+In this section, we define \MMCM and show that it is \CLS-complete.
+In a \emph{meta-metric}, all the requirements of a metric are satisfied except
+that the distance between identical points is not necessarily zero. The
+requirements for $d$ to be a meta-metric are given in the following definition.
+
+\begin{definition}[Meta-metric]
+\label{def:metametric}
+Let $\mathcal{D}$ be a set and $d:\mathcal{D}^2 \mapsto \Real$ a function such that:
+\begin{enumerate}
+\item $d(x, y) \ge 0$;
+\item $d(x, y) = 0$ implies $x = y$ (but, unlike for a metric, the converse is not required);
+\item $d(x, y) = d(y, x)$;
+\item $d(x, z) \le d(x, y) + d(y, z)$.
+\end{enumerate}
+Then $d$ is a meta-metric on $\mathcal{D}$.
+\end{definition}
+
+The problem \CM, as defined in~\cite{daskalakis2011continuous}, was inspired by
+Banach's fixed point theorem, where the contraction can be with respect to any
+metric.  In~\cite{daskalakis2011continuous}, for \CM the assumed metric was any
+metric induced by a norm. The choice of this norm (and thus metric) was
+considered part of the definition of the problem, rather than part of the
+problem input. In the following definition of \MMCM, the contraction is with
+respect to a meta-metric, rather than a metric, and this meta-metric is given as part of the input of
+the problem.
+
+\begin{definition}[\MMCM]
+\label{def:MMCM}
+%  {\large \textsf{Need to update this to use a p-norm instead of any arbitrary
+%  norm, and will update the proof accordingly.}}
+We are given as input an arithmetic circuit computing $f: [0,1]^3\to [0,1]^3$,
+an arithmetic circuit computing a meta-metric $d : [0,1]^3\times [0,1]^3 \to
+[0,1]$, some $p$-norm $\Norm{\cdot}_r$ and constants \mbox{$\e,c \in (0,1)$}
+and $\delta > 0$, and we are promised that $f$ is $c$-contracting with
+respect to $d$, and $\lambda$-continuous with respect to $\Norm{\cdot}$, and
+that $d$ is $\gamma$-continuous with respect to $\Norm{\cdot}$. The goal is
+to find
+\begin{enumerate}[label=(M\arabic*)]
+\item a point $x\in [0,1]^3$ such that $d(f(x),x) \leq \e$, \label{m_fixpoint}
+\item or two points $x,y\in [0,1]^3$ such that \label{m_violation}
+  \begin{enumerate}[label=(M\arabic{enumi}\alph*)]
+    \item $d(f(x),f(y))/d(x,y) > c$, \label{m_not_contracting}
+    \item $\Norm{d(x,y) - d(x',y')}/\Norm{(x,y)-(x',y')} > \delta$, or \label{m_bad_metametric}
+    \item $\Norm{f(x) - f(y)}/\Norm{x-y} > \lambda$. \label{m_bad_f}
+  \end{enumerate}
+\item points $x,y$, or $x,y,z$ in $[0,1]^3$ that witness a violation of one 
+	of the four defining properties of a meta-metric (Definition~\ref{def:metametric}). \label{mm_violation}
+\end{enumerate}
+\end{definition}
+
+\begin{definition}[\GCM]
+\label{def:GCM}
+The definition is identical to that of Definition~\ref{def:MMCM} identical except for the fact that 
+solutions of type \ref{mm_violation} are not allowed.
+\end{definition}
+
+So, while \MMCM allows violations of $d$ being a meta-metric
+as solutions, \GCM does not. 
+
+\begin{theorem}
+\label{thm:GCMinCLS}
+  \GCM is in \CLS.
+\end{theorem}
+\begin{proof}
+  Given an instance $X=(f,d,\e,c,\lambda,\delta)$ of \GCM, we set $p(x) \triangleq d(f(x),x)$. Then our $\CLO$ instance is the following:
+  \[Y=(f, p, \lambda' \triangleq (\lambda + 1) \delta, \e' \triangleq (1-c)\e).\]
+%
+Now consider any solution to $Y$. If our solution is of type \ref{c_fixpoint}, a
+	point $x$ such that $p(f(x)) > p(x) - \e'$, then we have $d(f(f(x)),f(x))
+	> d(f(x),x) - (1-c)\e$, and either $d(f(x),x) \leq \e$, in which case $x$ is
+	a solution for $X$, or $d(f(x),x) > \e$. In the latter case, we can divide
+	on both sides to get \[ \frac{d(f(f(x)),f(x))}{d(f(x),x)} > 1-
+	\frac{(1-c)\e}{d(f(x),x)} \geq 1- (1-c) = c\text{,} \] giving us a violation
+	of the claimed contraction factor of $c$, and a solution of type
+	\ref{m_not_contracting}.
+
+If our solution is a pair of points $x,y$ of type \ref{c_bad_f} satisfying $\Norm{f(x) - f(y)}/\Norm{x-y} > \lambda' \geq \lambda$, then this gives a violation of the $\lambda$-continuity of $f$. If instead $x,y$ are of type \ref{c_bad_p} so that $\Norm{p(x) - p(y)}/\Norm{x-y} > \lambda'$, then we have
+\[ \Abs{d(f(x),x) - d(f(y),y)} = \Abs{p(x) - p(y)} > (\lambda+1)\delta \Norm{x-y}\text{.} \]
+%  
+We now observe that if
+\[ \Abs{d(f(x),x) - d(f(y),y)} \leq \delta (\Norm{f(x)-f(y)} + \Norm{x - y}) \quad \text{and} \Norm{f(x) - f(y)}/\Norm{x-y} \leq \lambda,\] 
+	then we would have
+\[\Abs{d(f(x),x) - d(f(y),y)} \leq \delta (\Norm{f(x) - f(y)} + \Norm{x-y}) \leq (\lambda + 1)\delta \Norm{x-y},\] 
+which contradicts the above inequality, so either the $\delta$ continuity of $d$ must be violated giving a solution to $X$ of type \ref{m_bad_metametric} or the $\lambda$ continuity of $f$ must be violated giving a solution of type \ref{m_bad_f}.
+%
+Thus we have shown that $\GCM$ is in $\CLS$.
+\end{proof}
+
+Now that we have shown that \GCM is total, we note 
+that since the solutions of \GCM are a subset of those for \MMCM, we have the following.
+
+\begin{observation}
+\label{obs:MMCMtoGCM}
+\MMCM can be reduced in polynomial-time to \GCM.
+\end{observation}
+
+Thus, by Theorem~\ref{thm:GCMinCLS}, we have that \MMCM is in \CLS.
+%
+Next, we show that \MMCM is \CLS-hard by a reduction 
+from the canonical \CLS-complete problem \CLO to an instance of \MMCM.
+By Observation~\ref{obs:MMCMtoGCM}, we then also have that \GCM is \CLS-hard.
+
+\begin{theorem}
+\label{thm:MMCMisCLShard}
+  $\MMCM$ is $\CLS$-hard.
+\end{theorem}
+\begin{proof}
+  Given an instance $X = (f,p,\e,\lambda)$ of \CLO, we construct a meta-metric $d(x,y) = p(x) + p(y) + 1$. 
+	Since $p$ is non-negative, $d$ is non-negative, and by construction, $d$ is symmetric and satisfies the triangle inequality. Finally, $d(x,y) > 0$ for all choices of $x$ and $y$ so $d$ is a valid meta-metric (Definition~\ref{def:metametric}) Furthermore, if $p$ is $\lambda$-continuous with respect to the given $p$-norm $\Norm{\cdot}_r$, then $d$ is ($2^{1/r-1}\lambda$)-continuous with respect to $\Norm{\cdot}_r$. For clarity, in the below proof we'll omit the subscript $r$ when writing the norm of an expression. To see this we observe that $x,x',y,y'\in [0,1]^n$, we have $\Norm{p(x)-p(x')}/\Norm{x-x'} \leq \lambda$ and $\Norm{p(y) - p(y')}/\Norm{y-y'} \leq \lambda$, so
+  \begin{align*}
+    \frac{\Norm{d(x,y) - d(x',y')}}{\Norm{(x,y) - (x',y')}}
+    &= \frac{\Norm{p(x) - p(x') + p(y) - p(y') + 1 - 1}}{\Norm{(x,y) -(x',y')}}\ \leq\ \frac{\lambda\Norm{x-x'} + \lambda\Norm{y-y'}}{\Norm{(x,y) -(x',y')}}\\
+    &\leq \frac{\lambda\Norm{x-x'} + \lambda\Norm{y-y'}}{2^{1-1/r}(\Norm{x-x'} + \Norm{y-y'})} \leq 2^{1/r-1}\lambda \text{.}
+  \end{align*}
+We'll output an instance $Y = (f,d,\e'=\e,c = 1-\e/4,\delta=\lambda, \lambda'=2^{1/r-1}\lambda)$.
+
+Now we consider solutions for the instance $Y$ and show that they correspond to solutions for our input instance $X$.
+%
+First, we consider a solution of type \ref{m_fixpoint}, a point $x\in [0,1]^3$ such that $d(f(x),x) \leq \e'=\e$. We have $p(f(x)) + p(x) + 1 \leq \e$, but this can't happen since $\e < 1$ and $p$ is non-negative, so solutions of this type cannot exist.
+
+Now consider a solution that is a pair of points $x,y\in [0,1]^3$ satisfying one of the conditions in \ref{m_violation}. If the solution is of type \ref{m_not_contracting}, we have $d(f(x),f(y)) > c d(x,y)$, and by our choice of $c$ this is exactly
+\[\frac{d(f(x),f(y))}{d(x,y)} > (1-\e/4)\] and
+\begin{align*}
+  p(f(x)) + p(f(y)) + 1 &> (1-\e/4) (p(x) + p(y) + 1)\\
+                        &\geq p(x) + p(y) - 3\e/4
+\end{align*}
+so either $p(f(x)) > p(x) - \e$ or $p(f(y)) > p(y) - \e$, and one of $x$ or $y$ must be a fixpoint solution to our input instance.
+%
+Solutions of type \ref{m_bad_metametric} or \ref{m_bad_f} immediately give us violations of the $\lambda$-continuity of $f$, and thus solutions to $X$.
+
+This completes the proof that $\MMCM$ is $\CLS$-hard.
+\end{proof}
+
+So combining these results we have the following.
+
+\begin{theorem}
+\MMCM and \GCM are \CLS-complete.
+\end{theorem}
+
+Finally, as mentioned in the introduction, we note the following.
+Contemporaneously and independently of our work, Daskalakis, Tzamos, and
+Zampetakis~\cite{DTZ17} defined the problem \MBanach, which is like \MMCM except
+that it requires a metric, as opposed to a meta-metric.  They show that \MBanach
+is \CLS-complete.  Since every metric is a meta-metric, \MBanach can be
+trivially reduced in polynomial-time to \MMCM. Thus, their \CLS-hardness result
+is stronger than our Theorem~\ref{thm:MMCMisCLShard}.
+The
+containment of \MBanach in \CLS is implied by the containment of \MMCM in \CLS. 
+To prove
+that \MMCM is in \CLS, we first reduce to \GCM, which we then show is in \CLS.
+Likewise, the proof in~\cite{DTZ17} that \MBanach is in \CLS works even when
+violations of the metric properties are not required as solutions, so they, like
+us, actually show that \GCM is in \CLS.
