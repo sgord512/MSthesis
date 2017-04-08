@@ -33,7 +33,6 @@ and that $V$ increases by exactly 1 for each step we make along the line.
 Conditions T2 and T3 enforce this by saying that any violation of the property
 is also a solution to the problem. 
 
-
 In \EOML, the requirement of incrementing $V$ by exactly one as walk along the
 line is quite restrictive. We define a new problem, \EOPL,  which is similar in
 spirit to \EOL, but drops the requirement of always incrementing the potential
@@ -58,16 +57,115 @@ inter-reducible in polynomial-time.
 \begin{theorem}
 \EOML and \EOPL are equivalent under polynomial-time reductions.
 \end{theorem}
-%
+
+\section{\EOML to \EOPL}
+
 As expected, the reduction from~\EOML to \EOPL is relatively easy. It requires
 handling the difference in potential at $0^n$ and vertices with potential zero that
 are not discarded directly as possible solutions in \EOPL. We make the latter
 self loops, but that creates extra starts and ends of lines which need to be
-handled. Full details of the reduction with proofs are in
-Appendix~\ref{sec:EOMLtoEOPL}.
+handled.
 
-The reduction from \EOPL to \EOML is involved, and appears in detail in
-Appendix~\ref{sec:eopl2eoml}. Here the basic idea is to insert missing single
+\subsection{The Reduction}
+
+Given an instance $\CI$ of $\EOML$ defined by circuits $S,P$ and $V$ on vertex
+set $\{0,1\}^n$ we are going to create an instance $\CI'$ of \EOPL with circuits
+$S',P'$, and $V'$ on vertex set $\{0,1\}^{(n+1)}$, i.e., we introduce one extra bit.  
+This extra bit is essentially to take care of the difference in the value of potential 
+at the starting point in \EOML and \EOPL, namely $1$ and $0$ respectively. 
+
+Let $k=n+1$, then we create a potential function $V':\{0,1\}^k \rightarrow
+\{0,\dots,2^k-1\}$. 
+The idea is to make $0^k$ the starting point with potential zero as required,
+and to make all other vertices with first bit $0$ be dummy vertices with self
+loops. The real graph
+will be embedded in vertices with first bit $1$, i.e., of type $(1,\uu)$. Here
+by $(b,\uu)\in \{0,1\}^k$, where $b\in \{0,1\}$ and $\uu\in \{0,1\}^n$, we mean
+a $k$ length bit string with first bit set to $b$ and for each $i\in[2:k]$ bit $i$ 
+set to bit $u_i$.
+\begin{algo}
+  $V'(b,\uu)$: \IfB $b = 0$ \ReturnB $0$, \ElseB \ReturnB $V(\uu)$
+\end{algo}
+
+\begin{algo}
+  \underline{$S'(b,\uu)$}:\+
+  \\\IfB $(b,\uu)=0^k$:\+
+  \\  \ReturnB $(1,0^n)$\-
+  \\\IfB $b=0$ \AndB $\uu\neq 0^n$:\+
+  \\  \ReturnB $(b,\uu)$ \AlgoComment{Make self loops for dummy vertices}\-
+  \\\IfB $b=1$ \AndB $V(\uu)=0$:\+
+  \\  \ReturnB $(b,\uu)$ \AlgoComment{Make self loops for vertices with zero potential}\-
+  \\\IfB $b=1$ \AndB $V(\uu)>0$:\+
+  \\  \ReturnB $(b,S(\uu))$ \AlgoComment{Otherwise, follow $S$}\-
+\end{algo}
+
+\begin{algo}
+  \underline{$P'(b,\uu)$}:\+
+  \\\IfB $(b,\uu)=0^k$:\+
+  \\  \ReturnB $(b,\uu)$ \AlgoComment{The initial vertex points to itself in $P'$}\-
+  \\\IfB $b=0$ and $\uu\neq 0^n$:\+
+  \\  \ReturnB $(b,\uu)$ \AlgoComment{Make self loops for dummy vertices}\-
+  \\\IfB $b=1$ and $\uu=0^n$:\+
+  \\  \ReturnB $0^k$ \AlgoComment{M $(0,0^n)\rightarrow (1,0^n)$ edge consistent}\-
+  \\\IfB $b=1$ and $V(\uu)=0$:\+
+  \\  \ReturnB $(b,\uu)$ \AlgoComment{Make self loops for vertices with zero potential}\-
+  \\\IfB $b=1$ and $V(\uu)>0$ and $\uu \neq 0^n$:\+
+  \\  \ReturnB $(b,P(\uu))$ \AlgoComment{Otherwise, follow $P$}\-
+\end{algo}
+
+Valid solutions of \EOML of type T2 and T3 requires the potential to be strictly greater than zero, while solutions of \EOPL may have zero potential. However, a solution of \EOPL can not be a self loop, so we've added self-loops around vertices with zero potential in the \EOPL instance.
+By construction, the next lemma follows:
+\begin{lemma}\label{lem:m2p-valid}
+$S'$, $P'$, $V'$ are well defined and polynomial in the sizes of $S$, $P$, $V$ respectively. 
+\end{lemma}
+
+Our main theorem in this section is a consequence of the following three lemmas.
+
+\begin{lemma}\label{lem:m2p-sl}
+For any $\xx=(b,\uu)\in \{0,1\}^k$, $P'(\xx)=S'(\xx)=\xx$ (self loop) iff $\xx\neq 0^k$, and $b=0$ or $V(\uu)=0$.
+\end{lemma}
+\begin{proof}
+This follows by the construction of $V'$, the second condition in $S'$ and $P'$, and third and fourth conditions in $S'$ and $P'$ respectively. 
+\end{proof}
+
+\begin{lemma}\label{lem:m2p-r1}
+Let $\xx=(b,\uu)\in \{0,1\}^k$ be such that $S'(P'(\xx))\neq \xx \neq 0^k$ or $P'(S'(\xx))\neq \xx$ (an R1 type solution of \EOPL instance $\CI'$), then $\uu$ is a solution of \EOML instance $\CI$.
+\end{lemma}
+\begin{proof}
+The proof requires a careful case analysis. 
+By the first conditions in the descriptions of $S',P'$ and $V'$, we have $\xx \neq 0^k$. 
+Further, since $\xx$ is not a self loop, Lemma \ref{lem:m2p-sl} implies $b=1$  and $V'(1,\uu)=V(\uu)>0$.
+\medskip
+
+\noindent{\em Case I.}
+If $S'(P'(\xx))\neq \xx\neq 0^k$ then we will show that either $\uu$ is a genuine start of a line other than $0^n$ giving a T1 type solution of \EOML instance $\CI$, or there is some issue with the potential at $\uu$ giving either a T2 or T3 type solution of $\CI$. Since $S'(P'(1,0^n))=(1,0^n)$, $\uu \neq 0^n$. Thus if $S(P(\uu))\neq \uu$ then we get a T1 type solution of $\CI$ and proof follows. If $V(\uu)=1$ then we get a T2 solution of $\CI$ and proof follows. 
+
+Otherwise, we have $S(P(\uu))=\uu$ and $V(\uu)>1$. Now since also $b=1$ $(1,\uu)$ is not a self loop (Lemma \ref{lem:m2p-sl}). %and $S'(P'(b,\uu))\neq (b,\uu)$, we have that $(1,\uu)$ is not a selfloop. 
+Then it must be the case that $P'(1,\uu)=(1,P(\uu))$. However, $S'(1,P(\uu))\neq (1,\uu)$ even though $S(P(\uu))=\uu$. This happens only when $P(\uu)$ is a self loop because of $V(P(\uu))=0$ (third condition of $P'$).
+Therefore, we have $V(\uu)-V(P(\uu))>1$ implying that $\uu$ is a T3 type solution of $\CI$. 
+\medskip
+
+\noindent{\em Case II.}
+Similarly, if $P'(S'(\xx))\neq \xx$, then either $\uu$ is a genuine end of a line of $\CI$, or there is some issue with the potential at $\uu$. If $P(S(\uu))\neq \uu$ then we get T1 solution of $\CI$. Otherwise, $P(S(\uu))=\uu$ and $V(\uu)>0$. Now as $(b,\uu)$ is not a self loop and $V(\uu)>0$, it must be the case that $S'(b,\uu)=(1,S(\uu))$. However, $P'(1, S(\uu))\neq (b,\uu)$ even though $P(S(\uu))=\uu$. This happens only when $S(\uu)$ is a self loop because of $V(S(\uu))=0$. Therefore, we get $V(S(\uu))-V(\uu)<0$, i.e., $\uu$ is a type T3 solution of $\CI$. 
+\end{proof}
+
+\begin{lemma}\label{lem:m2p-r2}
+Let $\xx=(b,\uu)\in \{0,1\}^k$ be an R2 type solution of the constructed \EOPL instance $\CI'$, then $\uu$ is a type T3 solution of \EOML instance~$\CI$.
+\end{lemma}
+\begin{proof}
+Clearly, $\xx\neq 0^k$. Let $\yy = (b',\uu') = S'(\xx) \neq \xx$, and observe that $P(\yy) = \xx$. This also implies that $\yy$ is not a self loop, and hence $b=b'=1$ and $V(\uu)>0$ (Lemma \ref{lem:m2p-sl}). Further, $\yy = S'(1,\uu)=(1,S(\uu))$, hence $\uu'=S(\uu)$. Also, $V'(\xx)=V'(1,\uu)=V(\uu)$ and $V'(\yy)=V'(1,\uu')=V(\uu')$. 
+
+Since $V'(\yy)-V'(\xx)\le 0$ we get $V(\uu')-V(\uu)\le 0 \Rightarrow V(S(\uu)) - V(\uu) \le 0\Rightarrow V(S(\uu)) - V(\uu)\neq 1$. Given that $V(\uu)>0$, $\uu$ gives a type T3 solution of \EOML.
+\end{proof}
+
+\begin{theorem}\label{thm:m2p}
+An instance of \EOML can be reduced to an instance of \EOPL in linear time such that a solution of the former can be constructed in a linear time from the solution of the latter. 
+\end{theorem}
+
+\section{\EOPL to \EOML}
+\label{sec:eopl2eoml}
+
+The reduction from \EOPL to \EOML is fairly involved. Here the basic idea is to insert missing single
 increments in between by introducing new vertices along the original edges. To
 allow this we need to encode potential itself in the vertex description. If
 there is an edge from $\uu$ to $\uu'$ in the \EOPL instance whose respective
@@ -79,18 +177,230 @@ them self loops (not an end-of-line) with zero potential, and since
 non-end-of-line solutions of \EOML, namely $T2$ and $T3$, must have strictly
 positive potential, these will never create a solution of the \EOML instance.
 
-In addition, a number of issues need to be handled with consistency: $(a)$
+A number of issues need to be handled with consistency: $(a)$
 a $T2$ type solution of \EOML may be neither at the end of any line nor be a 
 potential violation in \EOPL; we do extra (linear time) work to handle such
 solutions, $(b)$ a $T3$ type potential violation may not be on a ``valid'' edge as
 required by \EOPL. $(c)$ ``invalid'' edges, $(d)$ potential difference at the
 initial vertex $0^n$, etc.
 
-% we make these dummy solutions self loops (non-end-of-line) with zero potential.} 
+\subsection{The Reduction}
+In this section we give a linear time reduction from an instance $\CI$ of \EOPL to an instance $\CI'$ of \EOML. Let the given \EOPL instance $\CI$ be defined on vertex set $\{0,1\}^n$ and with procedures $S,P$ and $V$, where $V:\{0,1\}^n\rightarrow \{0,\dots,2^m-1\}$.
 
-%which we handle by creating self loops and assigning zero potential. The fact that non-end-of-line solutions of \EOML, namely $T1$ and $T2$, must have strictly postive potential ensures no extra . }
+\medskip
 
-%The easier and expected reduction is from~\EOML to \EOPL. There are some details 
-%around the start and ends of the line. For \EOPL to \EOML, the basic idea is to
-%insert missing single increments in between. Both reductions appear with all details 
-%in Appendices~\ref{sec:EOMLtoEOPL} and~\ref{sec:eopl2eoml}, respectively.
+\noindent{\bf Valid Edge.} We call an edge $\uu \rightarrow \vv$ valid if $\vv=S(\uu)$ and $\uu=P(\vv)$. 
+\medskip
+
+We construct an \EOML instance $\CI'$ on $\{0,1\}^k$ vertices where $k=n+m$. 
+Let $S',P'$ and $V'$ denotes the procedures for $\CI'$ instance. 
+The idea is to capture value $V(\xx)$ of the potential in the $m$ least significant bits of vertex description itself, so that it can be gradually increased or decreased on valid edges. For vertices with irrelevant values of these least $m$ significant bits we will create self loops. Invalid edges will also become self loops, e.g., if $\yy=S(\xx)$ but $P(\yy)\neq \xx$ then set $S'(\xx,.)=(\xx,.)$. We will see how these can not introduce new solutions. 
+
+%
+In order to ensure $V'(0^k)=1$, the $V(S(0^n))=1$ case needs to be discarded. For
+this, we first do some initial checks to see if the given instance $\CI$ is not
+trivial.  If the input \EOPL instance is trivial, in the sense that either
+$0^n$ or $S(0^n)$ is a solution, then we can just return it.
+
+\begin{lemma}
+\label{lem:valid-edges}
+If $0^n$ or $S(0^n)$ are not solutions of \EOPL instance $\CI$ then $0^n
+\rightarrow S(0^n) \rightarrow S(S(0^n))$ are valid edges, and $V(S(S(0^n))\ge 2$. 
+\end{lemma}
+
+\begin{proof}
+Since both $0^n$ and $S(0^n)$ are not solutions, we have
+	$V(0^n)<V(S(0^n))<V(S(S(0^n)))$, $P(S(0^n))=0^n$, and for $\uu = S(0^n)$,
+	$S(P(\uu))=\uu$ and $P(S(\uu))=\uu$. In other words, $0^n \rightarrow S(0^n)
+	\rightarrow S(S(0^n))$ are valid edges, and since $V(0^n)=0$, we have
+	$V(S(S(0^n))\ge 2$. 
+\end{proof}
+
+%In $\CI'$ we want $V'(0^k)=1$. Therefore if $V(S(0^n))=1$ then it will interfer. 
+Let us assume now on that $0^n$ and $S(0^n)$ are not solutions of $\CI$, and
+then by Lemma \ref{lem:valid-edges}, we have $0^n \rightarrow S(0^n) \rightarrow
+S(S(0^n))$ are valid edges, and $V(S(S(0^n))\ge 2$. We can avoid the need to check
+whether $V(S(0))$ is one all together, by making $0^n$ point directly to
+$S(S(0^n))$ and make $S(0^n)$ a dummy vertex. 
+
+We first construct $S'$ and $P'$, and then construct $V'$ which will give
+value zero to all self loops, and use the least significant $m$ bits to give a
+value to all other vertices.
+%\medskip
+Before describing $S'$ and $P'$ formally, we first describe the underlying
+principles. Recall that in $\CI$ vertex set is $\{0,1\}^n$ and possible potential values are $\{0,\dots,2^m-1\}$, while in $\CI'$ vertex set is $\{0,1\}^k$ where $k=m+n$. 
+We will denote a vertex of $\CI'$ by a tuple $(\uu,\pi)$, where $\uu \in
+\{0,1\}^n$ and $\pi\in \{0,\dots,2^m-1\}$. 
+Here when we say that we introduce an {\em edge $\xx\rightarrow \yy$} we mean
+that we introduce a valid edge from $\xx$ to $\yy$, i.e., $\yy=S'(\xx)$ and $\xx=P(\yy)$. 
+%In what follows, let $(\uu,\pi)$ be a given vertex of $\CI'$. 
+\begin{itemize}
+\item Vertices of the form $(S(0^n),\pi)$ for any $\pi \in \{0,1\}^m$ and the vertex $(0^n,1)$ are
+dummies and hence have self loops.
+\item If $V(S(S(0^n))=2$ then we introduce an edge $(0^n,0)\rightarrow(S(S(0^n)),2)$, otherwise 
+\begin{itemize}
+\item for $p=V(S(S(0^n))$, we introduce the edges $(0^n,0)\ra (0^n,2)\ra (0^n, 3)\dots (0^n,p-1)\ra (S(S(0^n)),p)$.
+\end{itemize}
+\item If $\uu \ra \uu'$ valid edge in $\CI$ then let $p=V(\uu)$ and $p'=V(\uu')$
+\begin{itemize}
+\item If $p=p'$ then we introduce the edge $(\uu,p)\ra (\uu',p')$. %, and the rest of $(\uu,\pi),\ \forall \pi\neq p'$ are self loop.
+\item If $p<p'$ then we introduce the edges $(\uu,p)\ra (\uu,p+1)\ra \dots\ra (\uu,p'-1)\ra (\uu',p')$.
+\item If $p>p'$ then we introduce the edges $(\uu,p)\ra (\uu,p-1)\ra \dots\ra (\uu,p'+1)\ra (\uu',p')$.
+\end{itemize}
+\item If $\uu\neq 0^n$ is the start of a path, i.e., $S(P(\uu))\neq \uu$, then
+make $(\uu,V(\uu))$ start of a path by ensuring $P'(\uu,V(\uu))=(\uu,V(\uu))$.
+\item If $\uu$ is the end of a path, i.e., $P(S(\uu))\neq \uu$, then make
+$(\uu,V(\uu))$ end of a path by ensuring $S'(\uu,V(\uu))=(\uu,V(\uu))$.
+\end{itemize}
+
+Last two bullets above remove singleton solutions from the system by making them
+self loops. However, this can not kill all the solutions since there is a path
+starting at $0^n$, which has to end somewhere. Further, note that this entire process ensures that no new start or end of a paths are introduced. 
+%does not introduce extra solutions, which would be the start or end of a
+%different path. 
+\medskip
+\medskip
+
+\begin{algo}
+  \underline{$S'(\uu,\pi)$}:\+
+  \\\IfB ($\uu=0^n$ \AndB $\pi=1$) \OrB $\uu=S(0^n)$:\+
+  \\  \ReturnB $(\uu,\pi)$\-
+  \\\IfB $(\uu,\pi)=0^k$:\+
+  \\  $\uu'\gets S(S(0^n))$, $p'\gets V(\uu')$. 
+  \\  \IfB $p'=2$:\+
+  \\    \ReturnB $(\uu',2)$\-
+  \\   \ElseB:\+
+  \\     \ReturnB $(0^n,2)$\-\-
+  \\\IfB $\uu=0^n$:\+
+  \\  \IfB $2\le \pi<p'-1$:\+
+  \\    \ReturnB $(0^n,\pi+1)$\-
+  \\  \ElseIfB $\pi=p'-1$:\+
+  \\    \ReturnB $(S(S(0^n)),p')$\-
+  \\  \ElseB:\quad\AlgoComment{$\pi\ge p'$}\+
+  \\    \ReturnB $(\uu,\pi)$\-\-
+  \\
+  \\$\uu'\gets S(\uu)$, $p'\gets V(\uu')$, and $p\gets V(\uu)$
+  \\\IfB $P(\uu')\neq \uu$ \OrB $\uu'=\uu$: \+
+  \\  \ReturnB $(\uu,\pi)$\-
+  \\\IfB $\pi=p$ \AndB $p' \in \Set{p-1,p,p+1}$:\+
+  \\  \ReturnB $(\uu',p')$\-
+  \\\IfB $\pi<p\le p'$ \OrB $p\le p'\le \pi$ \OrB $\pi>p\ge p'$ \OrB $p\ge p'\ge \pi$:\+
+  \\  \ReturnB $(\uu,\pi)$\-
+  \\\ElseIfB $p<p'$:\+
+  \\  \IfB $p\le \pi<p'-1$:\+
+  \\    \ReturnB $(\uu,\pi+1)$\-
+  \\  \ElseB:\quad\AlgoComment{$\pi=p'-1$}\+
+  \\    \ReturnB $(\uu',p')$\-\-
+  \\\ElseIfB $p>p'$:\+
+  \\  \IfB $p \ge \pi>p'+1$:\+
+  \\    \ReturnB $(\uu,\pi-1)$\-
+  \\  \ElseB:\quad\AlgoComment{$\pi=p'+1$}\+
+  \\    \ReturnB $(\uu',p')$\-\-
+\end{algo}
+
+\begin{algo}
+\underline{$P'(\uu,\pi)$}:\+
+\\\IfB ($\uu=0^n$ \AndB $\pi=1$) \OrB $\uu=S(0^n)$:\+
+\\  \ReturnB $(\uu,\pi)$\-
+\\\IfB $\uu=0^n$:\+
+\\  \IfB $\pi=0$:\+
+\\    \ReturnB $0^k$\-
+\\  \IfB $\pi<V(S(S(0^n)))$ \AndB $\pi\notin \{1,2\}$:\+
+\\    \ReturnB $(0^n,\pi-1)$\-
+\\  \IfB $\pi<V(S(S(0^n)))$ \AndB $\pi=2$:\+
+\\    \ReturnB $0^k$\-\-
+\\\IfB $\uu=S(S(0^n))$ \AndB $\pi=V(S(S(0^n))$:\+
+\\  \IfB $\pi=2$:\+
+\\    \ReturnB $(0^n,0)$\-
+\\  \ElseB:\+
+\\    \ReturnB $(0^n,\pi-1)$\-\-
+\\\IfB $\pi=V(\uu)$:\+
+\\  $\uu'\gets P(\uu)$, $p'\gets V(\uu')$, and $p\gets V(\uu)$ 
+\\  \IfB $S(\uu')\neq \uu$ \OrB $\uu'=\uu$:\+
+\\    \ReturnB $(\uu,\pi)$\-
+\\  \ElseIfB $p=p'$:\+
+\\    \ReturnB $(\uu',p')$ \-
+\\  \ElseIfB $p'<p$:\+
+\\    \ReturnB $(\uu',p-1)$\-
+\\  \ElseB:\+
+\\    \ReturnB $(\uu',p+1)$\-\-
+\\\ElseB:\quad\AlgoComment{when $\pi \neq V(\uu)$}\+
+\\  $\uu'\gets S(\uu)$, $p'\gets V(\uu')$, and $p=V(\uu)$
+\\  \IfB $P(\uu')\neq \uu$ \OrB $\uu'=\uu$:\+
+\\    \ReturnB $(\uu,\pi)$\-
+\\  \ElseIfB $p'=p$ \OrB $\pi<p< p'$ \OrB $p<p'\le \pi$ \OrB $\pi>p> p'$ \OrB $p>p'\ge \pi$:\+
+\\    \ReturnB $(\uu,\pi)$\-
+\\  \ElseIfB $p<p'$:\quad\AlgoComment{$p<\pi\le p'-1$}\+
+\\    \ReturnB $(\uu,\pi-1)$\-
+\\  \ElseB:\quad\AlgoComment{$p>p'$, which implies $p> \pi\ge p'+1$}\+
+\\    \ReturnB $(\uu,\pi+1)$\-\-
+\end{algo}
+As mentioned before, the intuition for the potential function procedure $V'$ is to return zero for self loops, return $1$ for $0^k$, and return the number specified by the lowest $m$ bits for the rest. 
+
+\begin{algo}
+  \underline{$V'(\uu,\pi)$}:\+
+  \\$\xx \gets (\uu,\pi)$
+  \\\IfB $\xx=0^k$:\+
+  \\  \ReturnB $1$\-
+  \\\ElseIfB $S'(\xx) = \xx$ \AndB $P'(\xx)=\xx$:\+
+  \\  \ReturnB $0$\-
+  \\\ElseB:\quad\AlgoComment{$S'(\xx) \neq \xx$ or $P'(\xx)\neq \xx$}\+
+  \\  \ReturnB $\pi$.\-
+\end{algo}
+
+The fact that procedures $S'$, $P'$ and $V'$ give a valid \EOML instance follows from construction.
+\begin{lemma}\label{lem:p2m-valid}
+Procedures $S'$, $P'$ and $V'$ gives a valid \EOML instance on vertex set $\{0,1\}^k$, where $k=m+n$ and $V':\{0,1\}^k\ra \{0,\dots, 2^k-1\}$.
+\end{lemma}
+
+The next three lemmas shows how to construct a solution of \EOPL instance $\CI$ from a type T1, T2, or T3 solution of constructed \EOML instance $\CI'$.
+The basic idea for next lemma, which handles type T1 solutions, is that we never create spurious end or start of a path. 
+\begin{lemma}\label{lem:p2m-t1}
+Let $\xx=(\uu,\pi)$ be a type T1 solution of constructed \EOML instance $\CI'$. Then $\uu$ is a type R1 solution of the given \EOPL instance $\CI$.
+\end{lemma}
+
+\begin{proof}
+Let $\Delta=2^m-1$.
+In $\CI'$, clearly $(0^n,\pi)$ for any $\pi \in {1,\dots, \Delta}$ is not a start or end of a path, and $(0^n,0)$ is not an end of a path. Therefore, $\uu\neq 0^n$. Since $(S(0^n),\pi), \forall \pi\in \{0,\dots,\Delta\}$ are self loops, $\uu \neq S(0^n)$.
+
+% There is a contradiction from here to the end 
+If to the contrary, $S(P(\uu))=\uu$ and $P(S(\uu))=\uu$. If $S(\uu)=\uu=P(\uu)$ then $(\uu,\pi),\ \forall \pi\in\{0,\dots,\Delta\}$ are self loops, a contradiction. 
+
+For the remaining cases, let $P'(S'(\xx))\neq \xx$, and let $\uu'=S(\uu)$. There is a valid edge from $\uu$ to $\uu'$ in $\CI$. Then we will create valid edges from $(\uu,V(\uu))$ to $(S(\uu),V(S(\uu))$ with appropriately changing second coordinates. The rest of $(\uu,.)$ are self loops, a contradiction. 
+
+Similar argument follows for the case when $S'(P'(\xx))\neq \xx$. 
+\end{proof}
+
+The basic idea behind the next lemma is that a T2 type solution in $\CI'$ has
+potential $1$. Therefore, it is surely not a self loop. Then it is either an end of a path or near an end of a path, or else near a potential violation. 
+
+\begin{lemma}\label{lem:p2m-t2}
+Let $\xx=(\uu,\pi)$ be a type T2 solution of $\CI'$. Either $\uu \neq 0^n$ is start of a path in $\CI$ (type R1 solution), or $P(\uu)$ is an R1 or R2 type solution in $\CI$, or $P(P(\uu))$ is an R2 type solution in $\CI$.
+\end{lemma}
+
+\begin{proof}
+Clearly $\uu \neq 0^n$, and $\xx$ is not a self loop, i.e., it is not a dummy vertex with irrelevant value of $\pi$. Further, $\pi=1$. If $\uu$ is a start or end of a path in $\CI$ then done. 
+
+Otherwise, if $V(P(\uu))>\pi$ then we have $V(\uu)\le \pi$ and hence $V(\uu)-V(P(\uu))\le 0$ giving $P(\uu)$ as an R2 type solution of $\CI$. 
+If $V(P(\uu))<\pi=1$ then $V(P(\uu))=0$. Since potential can not go below zero, either $P(\uu)$ is an end of a path, or for $\uu''=P(P(\uu))$ and $\uu'=P(\uu)$ we have $\uu'=S(\uu'')$ and $V(\uu')-V(\uu'')\le 0$, giving $\uu''$ as a type R2 solution of $\CI$.
+\end{proof}
+
+At a type T3 solution of $\CI'$ potential is strictly positive, hence these solutions are not self loops. If they correspond to potential violation in $\CI$ then we get a type R2 solution. But this may not be the case, if we made $S'$ or $P'$ self pointing due to end or start of a path respectively. In that case, we get a type R1 solution. The next lemma formalizes this intuition. 
+
+\begin{lemma}\label{lem:p2m-t3}
+Let $\xx=(\uu,\pi)$ be a type T3 solution of $\CI'$. If $\xx$ is a start or end of a path in $\CI'$ then $\uu$ gives a type R1 solution in $\CI$. Otherwise $\uu$ gives a type R2 solution of $\CI$.
+\end{lemma}
+
+\begin{proof}
+Since $V'(\xx)>0$, it is not a self loop and hence is not dummy, and $\uu\neq 0^n$. If $\uu$ is start or end of a path then $\uu$ is a type R1 solution of $\CI$. Otherwise, there are valid incoming and outgoing edges at $\uu$, therefore so at $\xx$. 
+
+If $V((S(\xx))-V(\xx)\neq 1$, then since potential either remains the same or increases or decreases exactly by one on edges of $\CI'$, it must be the case that $V(S(\xx))-V(\xx)\le 0$. This is possible only when $V(S(\uu))\le V(\uu)$. Since $\uu$ is not an end of a path we do have $S(\uu)\neq \uu$ and $P(S(\uu))=\uu$. Thus, $\uu$ is a type T2 solution of $\CI$.
+
+If $V((\xx)-V(P(\xx))\neq 1$, then by the same argument we get that for $(\uu'',\pi'')=P(\uu)$, $\uu''$ is a type R2 solution of $\CI$. 
+\end{proof}
+
+Our main theorem follows using Lemmas \ref{lem:p2m-valid}, \ref{lem:p2m-t1}, \ref{lem:p2m-t2}, and \ref{lem:p2m-t3}.
+
+\begin{theorem}\label{thm:p2m}
+An instance of \EOPL can be reduced to an instance of \EOML in polynomial time such that a solution of the former can be constructed in a linear time from the solution of the latter. 
+\end{theorem}

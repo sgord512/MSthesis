@@ -460,8 +460,128 @@ Among solutions of \EOPL instance $\CE$, there is no local potential maximizer,
 
 \newpage
 
-%%%%%%%%%%%%%%%%%%%%
-% END OF 12 pages!
-%%%%%%%%%%%%%%%%%%%%
+\section{Missing Procedures and Proofs from Section~\ref{sec:PLCPtoEOPL}}\label{app:PLCPtoEOPL}
+\subsection{Procedures $\isvalid$, $\ite$, and $\eti$}\label{app:proc}
+\begin{table}[!hbt]
+\caption{Procedure \isvalid(\uu)}\label{tab:iv}
+\begin{tabular}{|l|}
+\hline
+\hspace{5pt} {\bf If} $\uu=0^{n}$ {\bf then} {\bf Return} 1\\
+\hspace{5pt} {\bf Else} let $\tau = (u_{(d+1)}+\dots+u_{2d})$\\
+\hspace{15pt} {\bf If} $\tau> 1$ {\bf then} {\bf Return} 0\\
+\hspace{15pt} Let $S\leftarrow \emptyset$. \% set of tight inequalities. \\
+\hspace{15pt} {\bf If} $\tau = 0$ {\bf then} $S=S\cup \{ z=0\}$. \\
+\hspace{15pt} {\bf Else}\\
+\hspace{30pt} Set $l\leftarrow $ index of the non-zero coordinate in vector $(u_{(d+1)},\dots,u_{2d})$. \\
+\hspace{30pt} Set $S=\{y_l=0, s_l=0\}$.\\
+%Set $\yy\leftarrow \zeros, \ps\leftarrow zeros, z\leftarrow 0$. \\
+\hspace{15pt} {\bf For} each $i$ from $1$ to $d$ {\bf do} \\
+\hspace{30pt} {\bf If} $u_i=0$ {\bf then} $S=S\cup \{y_i=0\}$, {\bf Else} $S=S\cup \{s_i=0\}$\\
+\hspace{15pt} Let $A$ be a matrix formed by lhs of equalities $M\yy+\ps -\ones z=\qq$ and that of set $S$\\
+\hspace{15pt} Let $\bb$ be the corresponding rhs, namely $\bb=[\qq; \zeros_{d\times 1}]$.\\
+\hspace{15pt} Let $(\yy',\ps',z') \leftarrow \bb * A^{-1}$\\
+\hspace{15pt} {\bf If} $(\yy',\ps',z') \in \CPol$ {\bf then} {\bf Return} 1, {\bf Else} {\bf Return} 0 \\
+\hline
+\end{tabular}
+\end{table}
 
+\begin{table}[!hbt]
+\caption{Procedures \ite(\uu) and \eti(\yy,\ps,z)}\label{tab:ei}
+\begin{tabular}{|l|}
+\hline
+\begin{tabular}{l}
+$\ite(\yy,\ps,z)$ \\ \hline
+\hspace{5pt} {\bf If} $\exists i \in [d]$ s.t. $y_i * s_i \neq 0$ {\bf then} {\bf Return} $(\zeros_{(2d-2)\times 1};1;1)$ \% Invalid \\
+\hspace{5pt} Set $\uu\leftarrow \zeros_{2d\times 1}$. Let $DL=\{i\in [d]\ |\ y_i=0\mbox{ and } s_i=0\}$.\\
+\hspace{5pt} {\bf If} $|DL|>1$ {\bf then} {\bf Return} $(\zeros_{(2d-2)\times 1};1;1)$ \%In valid \\
+\hspace{5pt} {\bf If} $|DL|=1$ {\bf then} for $i\in DL$, set $u_i\leftarrow 1$\\
+\hspace{5pt} {\bf For} each $i\in [d]$ {\bf If} $s_i=0$ {\bf then} set $u_{d+i}\leftarrow 1$\\
+\hspace{5pt} {\bf Return} $\uu$
+\end{tabular}
+\\ \hline
+\begin{tabular}{l}
+$\eti(\uu)$  \\ \hline
+\hspace{5pt} {\bf If} $\uu=0^n$ {\bf then} {\bf Return} $(\zeros_{d \times 1}, \qq+z^0+1, z^0+1)$ \% This case will never happen\\
+\hspace{5pt} {\bf If} \isvalid(\uu)=0 {\bf then} {\bf Return} $\zeros_{(2d+1) \times 1}$\\
+\hspace{5pt} Let $\tau = (u_{(d+1)}+\dots+u_{2d})$\\
+\hspace{5pt} Let $S\leftarrow \emptyset$. \% set of tight inequalities. \\
+\hspace{5pt} {\bf If} $\tau = 0$ {\bf then} $S=S\cup \{ z=0\}$. \\
+\hspace{5pt} {\bf Else}\\
+\hspace{15pt} Set $l\leftarrow $ index of non-zero coordinate in vector $(u_{(d+1)},\dots,u_{2d})$. \\
+\hspace{15pt} Set $S=\{y_l=0, s_l=0\}$.\\
+%Set $\yy\leftarrow \zeros, \ps\leftarrow zeros, z\leftarrow 0$. \\
+\hspace{5pt} {\bf For} each $i$ from $1$ to $d$ {\bf do} \\
+\hspace{15pt} {\bf If} $u_i=0$ {\bf then} $S=S\cup \{y_i=0\}$, {\bf Else} $S=S\cup \{s_i=0\}$\\
+\hspace{5pt} Let $A$ be a matrix formed by lhs of equalities $M\yy+\ps -\ones z=\qq$ and that of set $S$\\
+\hspace{5pt} Let $\bb$ be the corresponding rhs, namely $\bb=[\qq; \zeros_{d\times 1}]$.\\
+\hspace{5pt} {\bf Return} $\bb * A^{-1}$\\
+\end{tabular}\\
+\hline
+\end{tabular}
+\end{table}
 
+\subsection{Proof of Lemma~\ref{lem:vert}}
+
+\textbf{Lemma \ref{lem:vert}} (restated) : \emph{
+If $\isvalid(\uu)=1$ then $\uu=\ite(\eti(\uu))$, and the corresponding vertex $(\yy,\ps,z)\in \eti(\uu)$ of $\CPol$ is feasible in (\ref{eq:c}). If $(\yy,\ps,z)$ is a feasible vertex of (\ref{eq:c}) then $\uu=\ite(\yy,\ps,z)$ is a valid configuration, {\em i.e.,} $\isvalid(\uu)=1$.
+}
+\begin{proof}
+The only thing that can go wrong is that the matrix $A$ generated in $\isvalid$ and $\eti$ procedures are singular, or the set of double labels $DL$ generated in $\ite$ has more than one elements. 
+Each of these are possible only when more than $2d+1$ equalities of $\CPol$ hold at the corresponding point $(\yy,\ps,z)$, violating non-degeneracy assumption. 
+\end{proof}
+
+\subsection{Proof of Lemma~\ref{lem:PSF}}
+
+\textbf{Lemma \ref{lem:PSF}} (restated) : \emph{
+Functions $P$, $S$ and $\pot$ of instance $\CE$ are well defined, making $\CE$ a valid \EOPL instance. 
+}
+\begin{proof}
+Since all three procedures are polynomial-time in $\CL$, they can be defined
+by $poly(\CL)$-sized Boolean circuits. Furthermore, for any $\uu \in \vert$,
+we have that $S(\uu),P(\uu) \in \vert$. For~$\pot$, 
+since the value of $z \in [0,\ \Delta-1]$, we
+have $0\le \Delta^2(\Delta-z)\le \Delta^3$. Therefore, $\pot(\uu)$ is an
+integer that is at most $2 \cdot \Delta^3$ and hence is in set $\{0,\dots, 2^m-1\}$. 
+\end{proof}
+
+\subsection{Proof of Lemma~\ref{lem:pot}}
+
+\textbf{Lemma \ref{lem:pot}} (restated) : \emph{
+Let $\uu \neq \uu'$ be two valid configurations, i.e.,
+	$\isvalid(\uu)=\isvalid(\uu')=1$, and let $(\yy,\ps,z)$ and $(\yy',\ps',z')$
+	be the corresponding vertices in $\CPol$. Then the following holds: $(i)$
+	$\pot(\uu)=\pot(\uu')$ iff $z=z'$. $(ii)$ $\pot(\uu)>\pot(\uu')$ iff $z<z'$.
+}
+\begin{proof}
+Among the valid configurations all except $\zeros$ has positive $\pot$ value. Therefore, wlog let $\uu,\uu'\neq \zeros$. For these we have $\pot(\uu)=\lfloor \Delta^2*(\Delta -z)\rfloor$, and $\pot(\uu')=\lfloor \Delta^2*(\Delta -z')\rfloor$. 
+
+Note that since both $z$ and $z'$ are coordinates of vertices of $\CPol$, whose description has highest coefficient of $\max\{\max_{i,j\in [d]} M(i,j),\max_{i\in [d]} |q_i|\}$, and therefore their numerator and denominator both are bounded above by $\Delta$. Therefore, if $z< z'$ then we have 
+\[
+z'-z\ge \frac{1}{\Delta^2} \Rightarrow ((\Delta-z) - (\Delta - z'))*\Delta^2 \ge 1 \Rightarrow \pot(\uu)-\pot(\uu') \ge 1.
+\]
+
+For $(i)$, if $z=z'$ then clearly $\pot(\uu)=\pot(\uu')$, and from the above argument it also follows that if $\pot(\uu)= \pot(\uu')$ then it can not be the case that $z\neq z'$. Similarly for $(ii)$, if $\pot(\uu)>\pot(\uu')$ then clearly, $z'>z$, and from the above argument it follows that if $z'>z$ then it can not be the case that $\pot(\uu')\ge \pot(\uu)$. 
+\end{proof}
+
+\section{Pseudo-code for Lemke's algorithm}
+\label{app:lemke}
+
+%\begin{table}[!htb]
+%\caption{Lemke's Complementary Pivot Algorithm}\label{tab:lemke}
+\begin{tabular}{|l|}
+\hline
+\hspace{5pt} {\bf If} $\qq\ge 0$ {\bf then} {\bf Return} $\yy\leftarrow \zeros$ \\
+\hspace{5pt} $\yy\leftarrow 0, z\leftarrow |\min_{i \in [d]} q_i|, \ps=\qq+z\ones$\\
+\hspace{5pt} $i\leftarrow $ duplicate label at vertex $(\yy,\ps,z)$ in $\CPol$. $flag\leftarrow 1$ \\
+\hspace{5pt} {\bf While} $z>0$ {\bf do}\\
+\hspace{10pt} {\bf If} $flag=1$ {\bf then} set $(\yy',\ps',z')\leftarrow $ vertex obtained by relaxing $y_i=0$ at $(\yy,\ps,z)$ in $\CPol$\\
+\hspace{10pt} {\bf Else} set $(\yy',\ps',z')\leftarrow $ vertex obtained by relaxing $s_i=0$ at $(\yy,\ps,z)$ in $\CPol$\\
+\hspace{10pt} {\bf If} $z>0$ {\bf then}\\
+\hspace{15pt} $i \leftarrow $ duplicate label at $(\yy',\ps',z')$\\
+\hspace{15pt} {\bf If} $v_i>0$ and $v'_i=0$ {\bf then} $flag\leftarrow 1$. {\bf Else} $flag\leftarrow 0$\\
+\hspace{15pt} $(\yy,\ps,z)\leftarrow(\yy',\ps',z')$\\
+\hspace{5pt} End {\bf While} \\
+\hspace{5pt} {\bf Return} $\yy$\\
+\hline
+\end{tabular}
+%\end{table}
