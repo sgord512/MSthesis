@@ -1,23 +1,74 @@
 \chapter{\TwoDContractionMap to \EOPL}
+In this section, we reduce a slightly weaker variant of \CM to \EOPL. Aside from providing further evidence for the \CLS-hardness of \EOPL, the technique we introduce in this reduction is of independent interest and we believe may be applicable to reducing \CM, \MMCM, or \MBanach to \EOPL, which would show \CLS-completeness of \EOPL in the latter two cases.
 
+The variant of \CM (Definition~\ref{def:contractionmap}) we will consider here differs from \CM in that the domain and range of the map is $[0,1]^2$ instead of $[0,1]^3$, and in that the norm under consideration is required to be a $p$-norm.
 \begin{definition}[\TwoDContractionMap] 
   \label{def:2DContractionMap}
-  Given a function $f: [0,1]^2 \to [0,1]^2$, a positive constant $c < 1$, a constant $\delta > 0$, and an $\ell_p$-norm $\Norm{\cdot}_p$ for some constant $p$, we want to find one of the following:
-  \begin{enumerate}[label=(B\arabic*)]
-  \item A point $x \in [0,1]^2$ such that $\Norm{f(x) - x}_p \leq \delta$. \label{B1}
-  \item A pair of points $x,y \in [0,1]^2$ such that $\Norm{f(x) - f(y)}_p > c \Norm{x - y}_p$. \label{B2}
-  \end{enumerate}
+We are given as input an arithmetic circuit computing $f: [0,1]^2\to [0,1]^2$,
+a choice of $p$-norm $\Norm{\cdot}_p$, constants \mbox{$c \in (0,1)$}
+and $\delta > 0$, and we are promised that $f$ is $c$-contracting w.r.t. $\Norm{\cdot}$.
+The goal is to find
+\begin{enumerate}[label=(E\arabic*)]
+\item a point $x\in [0,1]^2$ such that $\Norm{f(x),x}_p \leq \delta$, 
+\item or two points $x,y\in [0,1]^3$ such that $\Norm{f(x) - f(y)}_p/\Norm{x-y}_p > c$. 
+\end{enumerate}
 \end{definition}
 
-Given an instance of Contraction Map $(f, c, \delta)$ over $[0,1]^2$ (where we want a point $z \in [0,1]^2$ such that $\Norm{f(z) - z}_p \leq \delta$), we can reduce it to \EOPL as follows:
+The observation underlying the reduction is that applying the standard reduction from the computational version of Brouwer's Fixed-Point Theorem to Sperner's Lemma in the special case of contraction maps results in instances of Sperner's Lemma that are in which the Sperner path traversed have a very special structure. This structure then allows us to assign a consistent potential function to the vertices of the \PPAD graph created in the reduction from Sperner's Lemma to \EOL.
 
-First, we'll discretize the problem as in the reduction from Brouwer's Theorem to Sperner's Lemma. Let $\e = \delta/2^{1+1/p}$. Let $n = \Ceil{1/\e}$.
+The precise version of the Sperner problem we will use is the following, due to Papadimitriou \cite{papadimitriou1994complexity}:
+\begin{definition}[\Sperner] 
+  \label{def:Sperner}
+  We are given as input an algorithm $\mycolor: \Set{0/n,1/n,\dotsc,n/n}^2 \to \Set{\Blue, \Red, \Yellow}$ that computes a color for the vertices of an $n\times n$ subdivision of the unit square in polynomial-time (in the binary representation of $n$). The coloring given by the algorithm satisfies the following constraints:
+  \begin{itemize}
+  \item $\mycolor(0, 0) = \Yellow$, $\mycolor(1, 0) = \Blue$, and $\mycolor(0, 1) = \Red$.
+  \item If $x_1 = 1$ or $x_2 = 1$, $\mycolor(x_1,x_2) \in \Set{\Blue, \Red}$.
+  \item If $x_1 = 0$, $\mycolor(x_1,x_2) \in \Set{\Red, \Yellow}$.
+  \item If $x_2 = 0$, $\mycolor(x_1,x_2) \in \Set{\Blue, \Yellow}$.
+  \end{itemize}
 
-We'll define our discretized problem over $D = \Set{-1/n,0/n,1/n,\dotsc,(n-1)/n,n/n,(n+1)/n}^2$. Points in $\Set{0/n,\dotsc,n/n}^2$ correspond to points in $[0,1]^2$ and will be colored accordingly and the remaining points will be colored according to the canonical border coloring for Sperner's Lemma.
+  The goal is to find a triangle $x,y,z$ formed by three corners of the a $1/n$-side length square such that $\Set{\mycolor(x),\mycolor(y),\mycolor(z)} = \Set{\Blue,\Red,\Yellow}$. Such a triangle is called a \emph{trichromatic} triangle.
+\end{definition}
 
-For any vector $z \in [0,1]^2$, let $\theta(z)$ denote the clockwise angle between the positive $x$-axis and $z$.
+Such a triangle is guaranteed to exist for any \emph{legal} coloring where a legal coloring is one that satisfies the above constraints, by Sperner's lemma \cite{papadimitriou1994complexity}.
 
-We assign colors from $\Set{\Yellow, \Blue, \Red}$ as follows:
+To reduce \Sperner to \EOL, we need to take the coloring given by $\mycolor$ and add a single square-width boundary around all of $[0,1]^n$, with a fixed coloring to obtain another coloring \[\mycolor_1 : \Set{-1/n,0/n,\dotsc,(n+1)/n}^2 \to \Set{\Blue, \Red, \Yellow}\text{.}\]  Since our interest is in the final \EOPL instance, we won't present a borderless coloring and then add a border, but rather we'll directly present the final coloring with a border.
+
+\section{The Reduction}
+We start with an instance $\CI$ of $\TwoDContractionMap$ consisting of $f$, $\Norm{\cdot}_p$, $c$, and $\delta$, We first set $\e \triangleq \delta/2^{2+1/p}$, and then set $n \triangleq 2^{\Ceil{\ln(1/\e)}} \geq \Ceil{1/\delta}$. We now define a domain $\Dom$ corresponding to a discretization of the unit square $[0,1]^2$ with a uniform thickness boundary added around it,
+\[\Dom = \Set{-1/n,0/n,1/n,\dotsc,(n-1)/n,n/n,(n+1)/n}^2\text{.}\]
+
+Let $\DomInt = \Set{0/n,\dotsc,n/n}^2 = \Dom\cap [0,1]^2$ be the points of $\Dom$ contained in the unit square.
+
+We'll define our \EOPL instance $\CE$ over triangles formed by triplets from $\Dom$.  Particularly our vertex set will consist of triangles defined by triples
+  \[z^0,z^1,z^2\] where either $z^1 = z^0 + (1,0)/n$ and $z^2 = z^0 - (0, 1)/n$ or $z^1 = z^0 + (1,-1)/n$ and $z^2 = z^0 - (1,0)/n$. These are triangles where the hypotenuse goes from top-left to bottom-right, and they are presented by listing the vertices in clockwise order. Let $\Delta(\Dom)$ denote the set of such triangles where $z^0,z^1,z^2 \in \Dom$, and let $\Delta(\DomInt) \subseteq \Delta(\Dom)$ denote the subset of $\Delta(\Dom)$ where $z^0,z^1,z^2 \in \DomInt$. We set $\vert = \Delta{\Dom}$.\footnote{To be fully formal, we would need to encode such triplets as binary strings. The obvious encoding of triples as the concatenation of the binary representations of the vertices would introduce dummy vertices which we could handle by making sure all dummy vertices were isolated with self-loops. See \ref{sec:PLCPtoEOPL} for a reduction in which we do exactly this.}
+
+  We'll start by constructing a coloring of $\Dom$ that consists of a fixed boundary coloring surrounding a legal coloring of $\DomInt$. For any point $x \in \DomInt$ $\mycolor(x)$ will depend on the direction of the displacement $f(x) - x$; points in $\Dom\setminus \DomInt$ will be colored according to the canonical border coloring for Sperner's Lemma. For any point $z \in [0,1]^2$, let $\theta(z)$ denote the clockwise angle between the positive $x$-axis and the vector $z$. An example coloring without a border, and one with a border are provided in Figures \ref{fig:withoutBorder} and \ref{fig:withBorder}, respectively. Figure \ref{fig:displacement} contains example with displacement vectors drawn at each point.
+
+  \begin{figure}
+    \centering
+    \begin{subfigure}[h]{0.7\textwidth}
+      \includegraphics[width=\textwidth]{ContractionToEOPL_example1_WithoutBorder}
+      \caption{A coloring for a contraction map without an added border.}
+      \label{fig:withoutBorder}
+    \end{subfigure}
+    \begin{subfigure}[h]{0.7\textwidth}
+      \includegraphics[width=\textwidth]{ContractionToEOPL_example1_WithBorder}
+      \caption{A coloring for a contraction map with an added border.}
+      \label{fig:withBorder}
+    \end{subfigure}    
+    \caption{Example colorings for a contraction map with and without an added border.}
+  \end{figure}
+
+
+  \begin{figure}[h] 
+    \caption{Coloring for a contraction map with displacement vectors shown at each non-boundary point.}
+    \centering
+    \includegraphics[width=0.7\textwidth]{ContractionToEOPL_example1_displacement}
+    \label{fig:displacement}
+  \end{figure}
+
+  We assign colors from $\Set{\Yellow, \Blue, \Red}$ as follows:
   \begin{algo}
     $\mycolor(z)$:\+
     \\ \IfB $z_1 = -1/n$ \textbf{and} $z_2 \neq -1/n$:\+
@@ -40,12 +91,46 @@ We assign colors from $\Set{\Yellow, \Blue, \Red}$ as follows:
     \\   \ReturnB $\Red$\-\-
   \end{algo}
 
-  This is the essentially standard coloring for the reduction from Brouwer to Sperner with ties broken in a way that makes the proof slightly simpler. We note that the coloring used satisfies the hypothesis of Sperner's lemma.
+  Let $\mycolor\restr_{\DomInt} : \DomInt \to \Set{\Blue, \Red, \Yellow}$ denote the restriction of $\mycolor$ to $\DomInt$. The following lemma is immediate:
+  \begin{lemma}
+    $\mycolor\restr_{\DomInt}$ is a legal coloring of $\DomInt$ for any function $f: [0,1]^2\to [0,1]^2$
+  \end{lemma}
 
-  We'll define our \EOPL instance over triangles formed by triplets from $D$. (Since \EOPL is technically defined over $\Set{0,1}^n$ we'd have to reduce the instance I describe below to one where our domain was $\Set{0,1}^{n'}$ for some reasonable $n'$, but I'm going to ignore this detail.) Particularly we'll consider triangles defined by triples
-  \[z^0,z^1,z^2\] where either $z^1 = z^0 + (1,0)/n$ and $z^2 = z^0 - (0, 1)/n$ or $z^1 = z^0 + (1,-1)/n$ and $z^2 = z^0 - (1,0)/n$. These are triangles where the hypotenuse goes from top-left to bottom-right, and they are presented by listing the vertices in clockwise order. Let $\Delta_D$ denote the set of such triangles. 
+  Moreover, the border coloring doesn't introduce any trichromatic triangle. As a result, we have that
+  \begin{lemma}
+    There exists a trichromatic triangle $x,y,z$ under $\mycolor$ where $x,y,z\in \DomInt$, and there are no trichromatic triangles containing vertices in $\Dom\setminus \DomInt$.
+  \end{lemma}
 
-  Before defining the \EOPL instance, we make the key observation needed to get a valid potential function: If $f$ is a valid contraction map (with any constant $c < 1$), there is no yellow point above a red point, that is there is no pair $z^Y,z^R \in D$ with $z^R = z^Y - (0,k/n)$ with $\mycolor(z^Y) = \Yellow$ and $\mycolor(z^R) = \Red$ for any $k$. As a result, the graph we will describe will never have edges from right to left, since edges from right to left will come from yellow vertices directly above red vertices ($k=1$). Thus, we can define potential in terms of distance from the left and distance from the top or bottom of the column containing a triangle depending on whether the triangle has a successor above it or below it.
+  Furthermore, any trichromatic triangle entirely contained in $\DomInt$ gives a solution to the starting instance $\CI$.
+
+  \begin{lemma} \label{lemma:TrichromaticTriangles}
+    If $z^Y,z^R,z^B \in \Delta(\DomInt)$ are yellow, red, and blue vertices, respectively, of a trichromatic triangle (not necessarily in clockwise order), then either $z^Y$ is a solution of type E1 or two of the vertices in the triangle give a solution of type E2.
+  \end{lemma}
+  \begin{proof}
+    By construction, $(f(z^Y) - z^Y)_1 (f(z^B) - z^B)_1 \leq 0$ and $(f(z^Y) - z^Y)_2 (f(z^R) - z^R)_2 \leq 0$.
+    If $f$ is $c$-contracting, then we have 
+    \begin{align*}
+      \Abs{(f(z^Y) - z^Y)_1} &\leq \Abs{(f(z^Y) - z^Y)_1 - (f(z^B) - z^B)_1}\\
+                             &= \Abs{(f(z^Y) - f(z^B))_1 + (z^B - z^Y)_1}\\
+                             &\leq \Abs{(f(z^Y) - f(z^B))_1} + \Abs{(z^Y - z^B)_1}\\
+                             &\leq \Norm{(f(z^Y) - f(z^B))_1} + \Norm{(z^Y - z^B)}\\
+                             &\leq (c+1)\Norm{(z^Y - z^B)_1}\\
+                             &\leq 4\e\\
+                             &\leq \delta/2^{1/p}
+    \end{align*}  and by an analogous argument, we have
+    \[ \Abs{(f(z^Y) - z^Y)_2} \leq \delta/2^{1/p}\text{.} \]
+
+    If either of these fails to hold, then the corresponding pair of points is a solution of type E2.
+
+    If both hold, then we have
+    \begin{align*}
+      \Norm{f(z^Y) - z^Y}_p &= \Paren{\Abs{(f(z^Y) - z^Y)_1}^p + \Abs{(f(z^Y) - z^Y)_2}^p}^{1/p} \\
+                          &\leq \Paren{\delta^p/2 + \delta^p/2}^{1/p}\\
+                          &\leq \delta
+    \end{align*} and $z^Y$ is a solution of type E1.
+  \end{proof}
+
+  Before defining the \EOPL instance from this coloring, we make the key observation needed to get a valid potential function: If $f$ is a valid contraction map (with any constant $c < 1$), there is no yellow point above a red point, i.e., there is no pair $z^Y,z^R \in D$ with $z^R = z^Y - (0,k/n)$ with $\mycolor(z^Y) = \Yellow$ and $\mycolor(z^R) = \Red$ for any $k$. 
 
   \begin{lemma} \label{lemma:YellowAboveRed}
     If $z^Y, z^R \in D$ with $z^R = z^Y - (0,1)/n$ such that $\mycolor(z^Y) = \Yellow$ and $\mycolor(z^R) = \Red$, then $\Norm{f(z^Y) - (z^R)}_p \geq \Norm{z^Y - z^R}_p$, and $f$ is not a contraction map.
@@ -61,51 +146,32 @@ We assign colors from $\Set{\Yellow, \Blue, \Red}$ as follows:
     so $z^R$ and $z^Y$ are witnesses to $f$ not being $c$-contracting (or contracting at all).
   \end{proof}
 
-  \begin{lemma} \label{lemma:TrichromaticTriangles}
-    If $z^Y,z^R,z^B$ are yellow, red, and blue vertices, respectively, of a trichromatic triangle (not necessarily in clockwise order), then either $z^Y$ is a solution of type \ref{B1} or two of the vertices in the triangle give a solution of type \ref{B2}.
-  \end{lemma}
-  \begin{proof}
-    By construction, $(f(z^Y) - z^Y)_1 (f(z^B) - z^B)_1 \leq 0$ and $(f(z^Y) - z^Y)_2 (f(z^R) - z^R)_2 \leq 0$.
-    If $f$ is $c$-contracting, then we have 
-    \begin{align*}
-      \Abs{(f(z^Y) - z^Y)_1} &\leq \Abs{(f(z^Y) - z^Y)_1 - (f(z^B) - z^B)_1}\\
-                             &= \Abs{(f(z^Y) - f(z^B))_1 + (z^B - z^Y)_1}\\
-                             &\leq \Abs{(f(z^Y) - f(z^B))_1} + \Abs{(z^Y - z^B)_1}\\
-                             &\leq (c+1)\Abs{(z^Y - z^B)_1}\\
-                             &\leq 2\e\\
-                             &\leq \delta/2^{1/p}
-    \end{align*} \todo{Verify that line 4 is correct} and by an analogous argument, we have
-    \[ \Abs{(f(z^Y) - z^Y)_2} \leq \delta\text{.} \]
+  \begin{corollary} \label{corollary:LeftEdgeIsSolution}
+    If $z^Y$ and $z^R$ are vertices of a triangle in $\Delta(\DomInt)$ with $\mycolor(z^Y) = \Yellow$, $\mycolor(z^R) = \Red$, and $z^Y = z^R + (0,1/n)$, then the pair $(z^Y,z^R)$ is a solution of type E2 for $\CE$.
+  \end{corollary}
 
-    If either of these fails to hold, then the corresponding pair of points is a solution of type \ref{B2}.
+  We now will construct the \EOPL instance from this coloring. Intuitively, two triangles will be adjacent if they share an edge with one $\Red$ endpoint and one $\Yellow$ endpoint. We will orient the edges of the \EOPL graph so that there is an edge from $(z^0, z^1, z^2)$ to $(w^0, w^1, w^2)$ if facing the shared $\Red$-$\Yellow$ from a point inside $(z^0, z^1, z^2)$, the $\Red$ endpoint is to the left of the $\Yellow$ endpoint. Equivalently, the edge is oriented in this way if the $\Red$ vertex immediately preceeds the $\Yellow$ vertex in a clockwise enumeration of the vertices $z^0,z^1,z^2$ (perhaps beginning with $z^1$ or $z^2$). 
 
-    If both hold, then we have
-    \begin{align*}
-      \Norm{f(z^Y) - z^Y}_p &= \Paren{\Abs{(f(z^Y) - z^Y)_1}^p + \Abs{(f(z^Y) - z^Y)_2}^p}^{1/p} \\
-                          &\leq \Paren{\delta^p/2 + \delta^p/2}^{1/p}\\
-                          &\leq \delta
-    \end{align*} and $z^Y$ is a solution of type \ref{B1}.
-  \end{proof}
-  We now define the \EOPL graph and potential function. The graph is exactly the same as in the reduction from Sperner's Lemma to \EOL:
+  Lemma~\ref{lemma:YellowAboveRed} now implies that the \EOPL graph will never have edges from right to left if $f$ is a contraction map, since edges from right to left have a yellow top-endpoint and a red bottom-endpoint. By Corollary~\ref{corollary:LeftEdgeIsSolution}, both triangles sharing such an edge give solutions to $\CE$, so we modify the graph to make the left triangle the start of its path, and the right triangle the end of its path.
 
   \begin{algo}
     $\Succ(z^0,z^1,z^2)$:\+
     \\ \IfB $\exists i,j$ with $j = i + 1 \pmod{3}$ such that $\mycolor(z^i) = \Red$ and $\mycolor(z^j) = \Yellow$:\+
-    \\   \IfB $z^1 = z^0 + (1,0)/n$:\quad // Top-right corner triangle\+    
+    \\   \IfB $z^1 = z^0 + (1,0)/n$:\quad\AlgoComment{Top-right corner triangle\+  }  
     \\     \IfB $i = 0$:\+
-    \\       \ReturnB $z^0+(0,1)/n,z^1,z^0$\quad // Successor is above\-
+    \\       \ReturnB $z^0+(0,1)/n,z^1,z^0$\quad\AlgoComment{Successor is above}\-
     \\     \ElseIfB $i = 1$:\+
-    \\       \ReturnB $z^1,z^2 + (1,0)/n,z^2$// Successor is to the right\-
-    \\     \ElseB:\quad // Successor is below and to the left\+
+    \\       \ReturnB $z^1,z^2 + (1,0)/n,z^2$\quad\AlgoComment{Successor is to the right}\-
+    \\     \ElseB:\quad\AlgoComment{Successor is below and to the left}\+
     \\       \ReturnB $z^0,z^2,z^0 - (0,1)/n$\-\-
-    \\   \ElseB:\quad // Bottom-left corner triangle\+
-    \\     \IfB $i = 0$:\quad // Successor is above and to the right\+
+    \\   \ElseB:\quad\AlgoComment{Bottom-left corner triangle}\+
+    \\     \IfB $i = 0$:\quad\AlgoComment{Successor is above and to the right}\+
     \\       \ReturnB $z^0,z^0+(1,0)/n,z^1$\-
-    \\     \ElseIfB $i = 1$:\quad // Successor is below\+
+    \\     \ElseIfB $i = 1$:\quad\AlgoComment{Successor is below}\+
     \\       \ReturnB $z^2,z^1,z^1-(0,1)/n$\-
-    \\     \ElseB: \quad// We have a violation of contraction by Lemma \ref{lemma:YellowAboveRed}\+
-    \\       \ReturnB $z^0,z^1,z^2$ \quad// Make this the end of a line\-\-\-
-    \\ \ReturnB $z^0,z^1,z^2$ \quad// Make a self-loop if no leaving edge
+    \\     \ElseB: \quad\AlgoComment{We have a violation of contraction by Lemma \ref{lemma:YellowAboveRed}}\+
+    \\       \ReturnB $z^0,z^1,z^2$\quad\AlgoComment{Make this the end of a line}\-\-\-
+    \\ \ReturnB $z^0,z^1,z^2$\quad\AlgoComment{Make a self-loop if no leaving edge}
   \end{algo}
     
   \begin{algo}
@@ -127,62 +193,57 @@ We assign colors from $\Set{\Yellow, \Blue, \Red}$ as follows:
     \\       \ReturnB $z^0-(1,0)/n,z^0,z^2$\-\-\-
     \\ \ReturnB $z^0,z^1,z^2$ \quad// Make a self-loop if no entering edge
   \end{algo}
+  
+  Having removed all right-to-left edges from the \EOPL graph, we'll be able to upper bound the length of the Sperner path starting in the bottom left triangle to get to any triangle in $\Delta(\Dom)$. We can then use this upper bound to assign potentials to each triangle that are guaranteed to be greater than any potential in a previous triangle along that path.
 
-  The idea behind the choice of potential function is that a triangle's potential should be equal to the length of the longest path that could have possibly led to this triangle. To that end, the potential of a triangle $z^0,z^1,z^2$ is the sum of the number of triangles to the left of this one, $2(n+2)(z^0_1 + 1)$, and the number of triangles before this one with top-left corners in the same column as $z^0$.
+  We will set a triangle's potential to the length of the longest path that could have possibly led to this triangle. To that end, the potential of a triangle $z^0,z^1,z^2$ will be the sum of the number of triangles to the left of this one, $2(n+2)(z^0_1 + 1)$, and the number of triangles ``before'' this one with top-left corners in the same column as $z^0$. This is slightly trickier than it sounds. 
+  Counting the number of triangles ``before'' the triangle in question is done by determining whether the path in this column is going up or down so that we can start counting from the bottom or top, respectively. To do this we first check whether the successor of this triangle gives us enough information to determine the direction. If not, we check the successor. If after doing this we still don't have enough information to determine the direction of the path in this column, then this triangle must be an isolated vertex, and we can give it a dummy potential value of $0$.
 
-  To determine how many triangles are before this one, we need to determine whether the path in this column is going up or down so that we can start counting from the bottom or top, respectively. To do this we first check whether the successor of this triangle gives us enough information to determine the direction. If not, we check the successor. If after doing this we still don't have enough information to determine the direction of the path in this column, then this triangle must be an isolated vertex, and we can give it a dummy potential value of $0$.
-
-One additional complication arises when we observe that there are two triangles sharing the same top-left corner, and we need to account for this when counting triangles before the current triangle in a column. 
+One additional complication arises when we observe that there are two triangles sharing the same top-left corner, and we need to account for this when counting triangles before the current triangle. 
   \begin{algo}
     $\Value(z^0,z^1,z^2)$:\+
     \\  $(s^0,s^1,s^2) \gets \Succ(z^0,z^1,z^2)$
     \\  $(p^0,p^1,p^2) \gets \Pred(z^0,z^1,z^2)$
-    \\  \IfB $(z^0,z^1,z^2) \neq (s^0,s^1,s^2)$:\quad // Has a possible successor\+
-    \\    \IfB $z^2 = z^0 - (0,1)/n$:\quad // Bottom-left corner triangle\+
-    \\      \IfB $s^0 = z^0$:\quad // Successor across the diagonal\+
+    \\  \IfB $(z^0,z^1,z^2) \neq (s^0,s^1,s^2)$:\quad\AlgoComment{Has a possible successor}\+
+    \\    \IfB $z^2 = z^0 - (0,1)/n$:\quad\AlgoComment{Bottom-left corner triangle}\+
+    \\      \IfB $s^0 = z^0$:\quad\AlgoComment{Successor across the diagonal}\+
     \\        \ReturnB $2(n+2)(z^0_1 + 1) + 2z^0_2$\-
-    \\      \ElseB:\quad // Successor is below, since there are no successors to the left\+
+    \\      \ElseB:\quad\AlgoComment{Successor is below, since there are no successors to the left}\+
     \\        \ReturnB $2(n+2)(z^0_1 + 1) + 2(n+1-z^0_2) + 1$\-\-
-    \\    \ElseB:\quad // Top-right corner triangle\+
-    \\      \IfB $s^0 = z^0$:\quad // Successor is across the diagonal\+
+    \\    \ElseB:\quad\AlgoComment{Top-right corner triangle}\+
+    \\      \IfB $s^0 = z^0$:\quad\AlgoComment{Successor is across the diagonal}\+
     \\        \ReturnB $2(n+2)(z^0_1 + 1) + 2(n+1-z^0_2)$\-
-    \\      \ElseIfB $s^2 = z^0$:\quad // Successor is above\+
+    \\      \ElseIfB $s^2 = z^0$:\quad\AlgoComment{Successor is above}\+
     \\        \ReturnB $2(n+2)(z^0_1 + 1) + 2z^0_2 + 1$\-\-\-
-    \\  // Either has no successor or is top-right corner triangle with successor to the right
-    \\  \IfB $(z^0,z^1,z^2) \neq (p^0,p^1,p^2)$:\quad Has a possible predecessor\+
-    \\    \IfB $z^2 = z^0 - (0,1)/n$:\quad // Bottom-left corner triangle, must not have had successor\+
-    \\      \IfB $p^0 = z^0$:\quad // Predecessor is across the diagonal\+
+    \\ \AlgoComment{Either has no successor or is top-right corner triangle with successor to the right}
+    \\  \IfB $(z^0,z^1,z^2) \neq (p^0,p^1,p^2)$:\quad\AlgoComment{Has a possible predecessor}\+
+    \\    \IfB $z^2 = z^0 - (0,1)/n$:\quad\AlgoComment{Bottom-left corner triangle, must not have had successor}\+
+    \\      \IfB $p^0 = z^0$:\quad\AlgoComment{Predecessor is across the diagonal}\+
     \\        \ReturnB $2(n+2)(z^0_1 + 1) + 2(n+1-z^0_2) + 1$\-
-    \\      \ElseB:\quad // Predecessor to the left with no successor or predecessor below\+
+    \\      \ElseB:\quad\AlgoComment{Predecessor to the left with no successor or predecessor below}\+
     \\        \ReturnB $2(n+2)(z^0_1 + 1) + 2z^0_2$\-\-
-    \\    \ElseB:\quad // Top-right corner triangle with no successor or right successor\+
-    \\      \IfB $p^2 = z^0$:\quad // Predecessor is above\+
+    \\    \ElseB:\quad\AlgoComment{Top-right corner triangle with no successor or right successor}\+
+    \\      \IfB $p^2 = z^0$:\quad\AlgoComment{Predecessor is above}\+
     \\        \ReturnB $2(n+2)(z^0_1 + 1) + 2(n+1-z^0_2)$\-
-    \\      \ElseB:\quad // Predecessor across the diagonal\+
+    \\      \ElseB:\quad\AlgoComment{Predecessor across the diagonal}\+
     \\        \ReturnB $2(n+2)(z^0_1 + 1) + 2z^0_2 + 1$\-\-\-
-    \\  \ReturnB $0$\quad // Isolated triangle, in a self-loop. 
+    \\  \ReturnB $0$\quad\AlgoComment{Isolated triangle, in a self-loop}. 
   \end{algo}
 
-  Here's an example of the Sperner instance created for a function that spirals in toward $(1/2,1/2)$, and a coarser version of the same instance with potentials added:
-
+  In Figure \ref{fig:potentials}, an example coloring and associated potentials are shown.
   \begin{figure}[h]
-    \caption{Discretization of a spiral with displacement vectors shown at each point.}
-    \centering
-    \includegraphics[width=0.9\textwidth]{ContractionToEOPL_example1_displacement}
-  \end{figure}
-
-  \begin{figure}[h]
-    \caption{Potentials for a coarser discretization of the same spiral as above.}
+    \caption{A coloring for a contraction map and associated potentials values.}
     \centering
     \includegraphics[width=0.9\textwidth]{ContractionToEOPL_example1_potentials}
+    \label{fig:potentials}
   \end{figure}
 
   \begin{lemma} \label{lemma:PotentialsIncreaseAlongPaths}
-    For any triangles $T_1,T_2 \in \Delta_D$, if $\Succ(T_1) = T_2$ and $\Pred(T_2) = T_1$, then $\Value(T_1) < \Value(T_2)$. 
+    For any triangles $T_1,T_2 \in \Delta(\Dom)$, if $\Succ(T_1) = T_2$ and $\Pred(T_2) = T_1$, then $\Value(T_1) < \Value(T_2)$. 
   \end{lemma}
 
   \begin{proof}
-    Since $T_1$ and $T_2$ are adjacent in the \EOPL graph, they must share a side. Furthermore, $T_2$ cannot be to the left of $T_1$ since any we break all paths rather than introduce an edge to the left. Thus, there are three cases to consider:
+    Since $T_1$ and $T_2$ are adjacent in the \EOPL graph, they must share a side. Furthermore, $T_2$ cannot be to the left of $T_1$ since we break all paths rather than introduce an edge to the left. Thus, there are three cases to consider:
     \begin{description}
     \item[$T_2$ is above $T_1$] In this case, the potential at $T_2$ and $T_1$ will be computed counting from the bottom of the column, and $\Value(T_2) > \Value(T_1)$.
     \item[$T_2$ is below $T_1$] In this case, the potential at $T_2$ and $T_1$ will be computed counting from the top of the column and $\Value(T_2) > \Value(T_1)$. 
@@ -191,29 +252,36 @@ One additional complication arises when we observe that there are two triangles 
   \end{proof}
 
   \begin{lemma} \label{EndOfLineSolutions}
-    Any solution $T \in \Delta_D$ of type \ref{A1} gives a solution for the \TwoDContractionMap instance.
+    Any solution $T \in \Delta(\Dom)$ of type R1 gives a solution for the \TwoDContractionMap instance.
   \end{lemma}
   \begin{proof}
-     Consider a solution $T \in \Delta_D$ of type \ref{A1}. By construction, every triangle without a red-yellow side is in a self-loop, so $T$ must have at least one red vertex and at least one yellow vertex. There are two cases to consider: Either $T$ also has a blue vertex, in which it is a trichromatic triangle, and gives a solution of type \ref{B1} by Lemma \ref{lemma:TrichromaticTriangles}, or two of $T$'s vertices are either red or yellow. In the latter case, one of the red-yellow sides must not correspond to a valid edge in the graph, since $T$ is the either the start or end of a line. The only red-yellow sides that don't correpons to valid edges in the graph are those that are predecessor edges to the right, or successor edges to the left. In either of those case, there is a yellow vertex above a red vertex in $T$, and by Lemma \ref{lemma:YellowAboveRed}, the yellow and red vertices witness $f$ not being a contraction map, and give a solution of type \ref{B2}.
+     Consider a solution $T \in \Delta(\DomInt)$ of type R1. By construction, every triangle without a red-yellow side is in a self-loop, so $T$ must have at least one red vertex and at least one yellow vertex. There are two cases to consider: Either $T$ also has a blue vertex, in which it is a trichromatic triangle, and gives a solution of type E1 by Lemma \ref{lemma:TrichromaticTriangles}, or two of $T$'s vertices are either red or yellow. In the latter case, one of the red-yellow sides must not correspond to a valid edge in the graph, since $T$ is the either the start or end of a line. The only red-yellow sides that don't correspond to valid edges in the graph are those that are predecessor edges to the right, or successor edges to the left. In either of those case, there is a yellow vertex above a red vertex in $T$, and by Lemma \ref{lemma:YellowAboveRed}, the yellow and red vertices witness $f$ not being a contraction map, and give a solution of type E2.
     \end{proof}
     
-    To complete the reduction, we choose for our starting triangle the following: \[(-1/n,0),(0,-1/n),(-1/n,-1/n)\]
+    To complete the reduction, we choose for our starting triangle the following: \[(-1/n,0),(0,-1/n),(-1/n,-1/n).\] We can immediately observe that this satisfies the requirement that it has no valid predecessor.
+
+    Finally, we observe that all of the algorithms presented can be implemented in polynomial time in the size of the input to $\CI$, and we conclude that
+    \begin{theorem}
+An instance of \TwoDContractionMap can be reduced to an instance of \EOPL in polynomial time such that a solution of the former can be constructed in polynomial time from the solution of the latter. 
+    \end{theorem}
+
+    
   
-  \begin{enumerate}
-  \item As far as I can tell, there can be edges pointing up in the graph other than those induced by the boundary. I should come up with an example containing edges of that sort. 
-  \item I believe this can be generalized to \ThreeDContractionMap, since I think it will be the case that paths will be limited in a similar way, so that we can assign consistent potential values to each point. 
-  \item We can look at the DTZ paper and see if their hardness proof gives us a metric from which we could do this same reduction. Or we could modify their metric somehow and still carry out the same sort of proof.
-  Can we use the $\lambda$-Lipschitz continuity of $d$ in the DTZ definition of MetricBanach to generalize this argument to that definition. 
+  % \begin{enumerate}
+  % \item As far as I can tell, there can be edges pointing up in the graph other than those induced by the boundary. I should come up with an example containing edges of that sort. 
+  % \item I believe this can be generalized to \ThreeDContractionMap, since I think it will be the case that paths will be limited in a similar way, so that we can assign consistent potential values to each point. 
+  % \item We can look at the DTZ paper and see if their hardness proof gives us a metric from which we could do this same reduction. Or we could modify their metric somehow and still carry out the same sort of proof.
+  % Can we use the $\lambda$-Lipschitz continuity of $d$ in the DTZ definition of MetricBanach to generalize this argument to that definition. 
 
-  If it's the case that we're given a metric which is of the form $d(x,y) = g(\Abs{x_1-x_2},\Abs{y_1-y_2})$, where $g$ is a non-decreasing function in both arguments, then I think everything works out. We may be able to extract solutions from violations of this. (Probably not, seems too rigid a constraint.)
+  % If it's the case that we're given a metric which is of the form $d(x,y) = g(\Abs{x_1-x_2},\Abs{y_1-y_2})$, where $g$ is a non-decreasing function in both arguments, then I think everything works out. We may be able to extract solutions from violations of this. (Probably not, seems too rigid a constraint.)
 
-  Fix the JavaScript to make sure all the colors are being computed correctly, and then update the images accordingly.
+  % Fix the JavaScript to make sure all the colors are being computed correctly, and then update the images accordingly.
 
-  \end{enumerate}
+  % \end{enumerate}
 
-  One other interesting observation: When $f$ is in fact a contraction map, there can be at most one edge from left-to-right in any given column by Lemma \ref{lemma:YellowAboveRed}. 
+  % One other interesting observation: When $f$ is in fact a contraction map, there can be at most one edge from left-to-right in any given column by Lemma \ref{lemma:YellowAboveRed}. 
 
-  Can we go from EOPL to a standard norm-based contraction in $n$-dimensions?
+  % Can we go from EOPL to a standard norm-based contraction in $n$-dimensions?
 
-  What is the role of uniqueness of solutions.
+  % What is the role of uniqueness of solutions.
   

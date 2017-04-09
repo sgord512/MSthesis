@@ -34,6 +34,10 @@
 \def\ThreeDContractionMap{\problem{3DContractionMap}\xspace}
 \def\TwoDContractionMap{\problem{2DContractionMap}\xspace}
 \def\DiscreteBrouwer{\problem{DiscreteBrouwer}\xspace}
+\def\Sperner{\problem{Sperner}\xspace}
+
+\def\Dom{D\xspace}
+\def\DomInt{D_{\mathrm{int}}\xspace}
 
 \def\e{\epsilon}
 \def\bx{\mathbf{x}}
@@ -55,6 +59,11 @@
 \def\ElseIfB{\textbf{Else If}\xspace}
 \def\AndB{\textbf{and}\xspace}
 \def\OrB{\textbf{or}\xspace}
+\def\ForB{\textbf{For}\xspace}
+\def\DoB{\textbf{Do}\xspace}
+\def\NotB{\textbf{not}\xspace}
+\def\True{\textsc{True}\xspace}
+\def\False{\textsc{False}\xspace}
 \newcommand{\AlgoComment}[1]{\textit{\% #1}}
 
 \def\ite{\mbox{ItoE}}
@@ -164,18 +173,9 @@
 \def\Seqbar#1#2{\Seq{#1 \Bigbar{#1 #2} #2}}
 \def\Brackbar#1#2{\Brack{#1 \Bigbar{#1 #2} #2}}
 
-\def\vert{\operatorname{\mathsf{vert}}}
-\def\horiz{\operatorname{horiz}}
-\def\cross{\operatorname{cross}}
+\def\restr{\mathord{\upharpoonright}}
 \def\mycolor{\operatorname{color}}
 \def\val{\operatorname{val}}
-\def\leftofcross{\operatorname{leftofcross}}
-\def\frame{\operatorname{frame}}
-\def\rightofcross{\operatorname{rightofcross}}
-\def\frameline{\operatorname{frameline}}
-\def\aboveorbelow{\operatorname{aboveorbelow}}
-\def\line{\operatorname{line}}
-\newcommand{\coord}[1]{\left\llbracket#1\right\rrbracket}
 
 \def\begin@lgo{\begin{minipage}{1in}\begin{tabbing}
 		\quad\=\qquad\=\qquad\=\qquad\=\qquad\=\qquad\=\qquad\=\qquad\=\qquad\=\qquad\=\qquad\=\qquad\=\qquad\=\kill}
@@ -215,3 +215,4 @@
 \newcommand{\ssum}{\mbox{$\sigma$}} %\rm sum}}
 \newcommand{\SSS}{\mbox{\boldmath $S$}}
 \newcommand{\DDelta}{\mbox{\boldmath $\Delta$}}
+
