@@ -476,7 +476,8 @@
 \AtBeginDocument{\let\thesis@thebib\thebibliography
     \let\thesis@endbib\endthebibliography
     \def\thebibliography{\begingroup\singlespacing%
-        \chapter{\bibname}%
+        \addcontentsline{toc}{chapter}{\bibname}%
+        \chapter*{\bibname}%
         \let\chapter\@gobbletwo%
         \thesis@thebib}
     \def\endthebibliography{\thesis@endbib\endgroup}}
