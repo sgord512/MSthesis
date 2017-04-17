@@ -43,10 +43,11 @@
 \def\bx{\mathbf{x}}
 \def\grad{\nabla}
 \def\del{\partial}
-\def\Succ{\mathbf{S}}
-\def\Pred{\mathbf{P}}
-\def\Value{\mathbf{V}}
-\def\mycolor{\operatorname{color}}
+\DeclareMathOperator{\Neighbors}{\texttt{N}}
+\DeclareMathOperator{\Succ}{\texttt{S}}
+\DeclareMathOperator{\Pred}{\texttt{P}}
+\DeclareMathOperator{\Value}{\texttt{V}}
+\DeclareMathOperator{\mycolor}{\texttt{color}}
 \def\Yellow{\textsc{Yellow}}
 \def\Red{\textsc{Red}}
 \def\Blue{\textsc{Blue}}
@@ -174,7 +175,6 @@
 \def\Brackbar#1#2{\Brack{#1 \Bigbar{#1 #2} #2}}
 
 \def\restr{\mathord{\upharpoonright}}
-\def\mycolor{\operatorname{color}}
 \def\val{\operatorname{val}}
 
 \def\begin@lgo{\begin{minipage}{1in}\begin{tabbing}

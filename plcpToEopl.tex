@@ -1,7 +1,7 @@
 \chapter{Reduction from \PLCP to \EOPL}
 \label{sec:PLCPtoEOPL}
 
-In this section we present a polynomial-time reduction from the P-matrix Linear
+In this chapter we present a polynomial-time reduction from the P-matrix Linear
 Complementarity Problem (\PLCP) to \EOPL.
 A Linear Complementarity Problem (LCP) is defined as follows. Now on by $[n]$ we mean set $\{1,\dots,n\}$.
 
@@ -63,7 +63,7 @@ the matrix $M$ is not a P-matrix.  The structure of the path traced by Lemke's
 algorithm is crucial for our reduction, so let us first briefly describe the
 algorithm.
 
-\subsection{Lemke's Algorithm}
+\section{Lemke's Algorithm}
 \label{sec:lemke}
 
 The explanation of Lemke's algorithm in this section is taken from \cite{GMSV}.
@@ -109,7 +109,7 @@ path must end either in a vertex satisfying $z = 0$, i.e., a solution to the ori
 latter case, the algorithm is unsuccessful in finding a solution to the original system; in particular, the original system
 may not have a solution.  
 
-\subsection{Polynomial time reduction from \PLCP to \EOPL}
+\section{Polynomial time reduction from \PLCP to \EOPL}
 
 It is well known that if matrix $M$ is a P-matrix (\PLCP), then $z$ strictly
 decreases on the path traced by Lemke's algorithm \cite{cottle2009linear}.
@@ -147,7 +147,7 @@ uniquely identified by which of $y_i=0$ and $s_i=0$ hold for each $i$ and its
 duplicate label. We will use this idea to represent vertices in the \EOPL
 instance $\CE$. 
 
-\subsubsection{\bf \EOPL Instance $\CE$.}
+\subsection{\bf \EOPL Instance $\CE$.}
 
 In the following, we'll write $M = (M_1, M_2, \dotsc, M_d)^T$, so that $\Set{M^T_i}_{i\in [d]}$ are the rows of $M$.
 We first define some constants needed for the reduction. We'll let 

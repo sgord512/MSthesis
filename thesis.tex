@@ -1,4 +1,4 @@
-\documentclass[draftthesis,tocnosub,noragright,centerchapter,12pt,mixcasechap]{uiucecethesis09}
+\documentclass[tocnosub,noragright,centerchapter,12pt,mixcasechap]{uiucecethesis09}
 
 \usepackage{multirow,stmaryrd}
 \usepackage{comment,amsfonts}
@@ -41,6 +41,10 @@
 
 \usepackage[charter]{mathdesign}
 \usepackage{microtype}%if unwanted, comment out or use option "draft"
+
+\usepackage{hyperref}
+\hypersetup{pdftex,colorlinks=true,allcolors=blue}
+\usepackage{hypcap}
 
 \input{prefix}
 
@@ -137,13 +141,13 @@ TO BE FILLED IN!!!!Dedicated to my parents and sisters.
 % \todo{Remove draft headings, todos}
 % \todo{SEND IT OUT!}
 % \todo{Send it out.}
+% \todo{Fix the references to parts of definitions!}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INSERT REAL CONTENT HERE
 %
 \include{intro}	% for INTRODUCTION in "intro.tex"
-\include{preliminaries}
 \include{mmcmCompleteness}
 \include{eomlAndEopl}
 \include{plcpToEopl}

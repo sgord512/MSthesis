@@ -1,7 +1,7 @@
 \chapter{\EOML to \EOPL and Back}
 \label{sec:EOMLtoEOPL}
 
-In this section, we define a new problem \EOPL.
+In this chapter, we define a new problem \EOPL.
 Then, we design polynomial-time reductions from \EOML to \EOPL, and
 from \EOPL to \EOML, thereby showing that the two problems 
 are polynomial-time equivalent. In Section~\ref{sec:PLCPtoEOPL},
@@ -15,14 +15,14 @@ to define \PPAD~\cite{papadimitriou1994complexity}.
 \begin{definition}[\EOML~\cite{hubavcek2017hardness}]
 Given circuits $S,P: \{0,1\}^n \rightarrow \{0,1\}^n$, and $V:\{0,1\}^n\rightarrow \{0,\dots, 2^n\}$ such that $P(0^n) =0^n\neq S(0^n)$ and $V(0^n)=1$, find a string $\xx \in \{0,1\}^n$ satisfying one of the following 
 \begin{enumerate}[label=(T\arabic*)]
-\item either $S(P(\xx))\neq \xx \neq 0^n$ or $P(S(\xx))\neq \xx$,
-\item $\xx\neq 0^n, V(\xx)=1$,
-\item either $V(\xx)>0$ and $V(S(\xx))-V(\xx)\neq 1$, or $V(\xx)>1$ and $V(\xx)-V(P(\xx))\neq 1$. 
+\item either $S(P(\xx))\neq \xx \neq 0^n$ or $P(S(\xx))\neq \xx$, \label{eoml:eol}
+\item $\xx\neq 0^n, V(\xx)=1$, \label{eoml:other_start}
+\item either $V(\xx)>0$ and $V(S(\xx))-V(\xx)\neq 1$, or $V(\xx)>1$ and $V(\xx)-V(P(\xx))\neq 1$. \label{eoml:bad_potential}
 \end{enumerate}
 \end{definition}
 Intuitively, an \EOML is an \EOL instance that is also equipped with an
 ``odometer'' function. The circuits $P$ and $S$ implicitly define an
-exponentially large graph in which each vertex has degree at most 2, just as in \EOL, and condition T1 says that the end of
+exponentially large graph in which each vertex has degree at most 2, just as in \EOL, and condition \ref{eoml:eol} says that the end of
 every line (other than $0^n$) is a solution.
 In particular, the string 
 $0^n$ is guaranteed to be the end of a line, and so a solution can be found by
@@ -30,7 +30,7 @@ following the line that starts at $0^n$.
  The function $V$ is intended to help with this, by giving the number of steps
 that a given string is from the start of the line. We have that $V(0^n) = 1$,
 and that $V$ increases by exactly 1 for each step we make along the line.
-Conditions T2 and T3 enforce this by saying that any violation of the property
+Conditions \ref{eoml:other_start} and \ref{eoml:bad_potential} enforce this by saying that any violation of the property
 is also a solution to the problem. 
 
 In \EOML, the requirement of incrementing $V$ by exactly one as walk along the
@@ -42,8 +42,8 @@ by one as we move along the line.
 \label{def:EOPL}
 Given Boolean circuits $S,P : \Set{0,1}^n \to \Set{0,1}^n$ such that $P(0^n) =0^n\neq S(0^n)$ and a Boolean circuit $V: \Set{0,1}^n \to \Set{0,1,\dotsc,2^m - 1}$ such that $V(0^n) = 0$ find one of the following:
 \begin{enumerate}[label=(R\arabic*)]
-\item A point $x \in \Set{0,1}^n$ such that $S(P(x)) \neq x \neq 0^n$ or $P(S(x)) \neq x$.
-\item A point $x \in \Set{0,1}^n$ such that $x \neq S(x)$, $P(S(x)) = x$, and $V(S(x)) - V(x) \leq 0$.
+\item A point $x \in \Set{0,1}^n$ such that $S(P(x)) \neq x \neq 0^n$ or $P(S(x)) \neq x$. \label{eopl:eol}
+\item A point $x \in \Set{0,1}^n$ such that $x \neq S(x)$, $P(S(x)) = x$, and $V(S(x)) - V(x) \leq 0$. \label{eopl:bad_potential}
 \end{enumerate}
 \end{definition}
 
@@ -113,7 +113,7 @@ set to bit $u_i$.
   \\  \ReturnB $(b,P(\uu))$ \AlgoComment{Otherwise, follow $P$}\-
 \end{algo}
 
-Valid solutions of \EOML of type T2 and T3 requires the potential to be strictly greater than zero, while solutions of \EOPL may have zero potential. However, a solution of \EOPL can not be a self loop, so we've added self-loops around vertices with zero potential in the \EOPL instance.
+Valid solutions of \EOML of type \ref{eoml:other_start} and \ref{eoml:bad_potential} requires the potential to be strictly greater than zero, while solutions of \EOPL may have zero potential. However, a solution of \EOPL can not be a self loop, so we've added self-loops around vertices with zero potential in the \EOPL instance.
 By construction, the next lemma follows:
 \begin{lemma}\label{lem:m2p-valid}
 $S'$, $P'$, $V'$ are well defined and polynomial in the sizes of $S$, $P$, $V$ respectively. 
@@ -129,7 +129,7 @@ This follows by the construction of $V'$, the second condition in $S'$ and $P'$,
 \end{proof}
 
 \begin{lemma}\label{lem:m2p-r1}
-Let $\xx=(b,\uu)\in \{0,1\}^k$ be such that $S'(P'(\xx))\neq \xx \neq 0^k$ or $P'(S'(\xx))\neq \xx$ (an R1 type solution of \EOPL instance $\CI'$), then $\uu$ is a solution of \EOML instance $\CI$.
+Let $\xx=(b,\uu)\in \{0,1\}^k$ be such that $S'(P'(\xx))\neq \xx \neq 0^k$ or $P'(S'(\xx))\neq \xx$ (an \ref{eopl:eol} type solution of \EOPL instance $\CI'$), then $\uu$ is a solution of \EOML instance $\CI$.
 \end{lemma}
 \begin{proof}
 The proof requires a careful case analysis. 
@@ -138,24 +138,24 @@ Further, since $\xx$ is not a self loop, Lemma \ref{lem:m2p-sl} implies $b=1$  a
 \medskip
 
 \noindent{\em Case I.}
-If $S'(P'(\xx))\neq \xx\neq 0^k$ then we will show that either $\uu$ is a genuine start of a line other than $0^n$ giving a T1 type solution of \EOML instance $\CI$, or there is some issue with the potential at $\uu$ giving either a T2 or T3 type solution of $\CI$. Since $S'(P'(1,0^n))=(1,0^n)$, $\uu \neq 0^n$. Thus if $S(P(\uu))\neq \uu$ then we get a T1 type solution of $\CI$ and proof follows. If $V(\uu)=1$ then we get a T2 solution of $\CI$ and proof follows. 
+If $S'(P'(\xx))\neq \xx\neq 0^k$ then we will show that either $\uu$ is a genuine start of a line other than $0^n$ giving a \ref{eoml:eol} type solution of \EOML instance $\CI$, or there is some issue with the potential at $\uu$ giving either a \ref{eoml:other_start} or \ref{eoml:bad_potential} type solution of $\CI$. Since $S'(P'(1,0^n))=(1,0^n)$, $\uu \neq 0^n$. Thus if $S(P(\uu))\neq \uu$ then we get a \ref{eoml:eol} type solution of $\CI$ and proof follows. If $V(\uu)=1$ then we get a \ref{eoml:other_start} solution of $\CI$ and proof follows. 
 
 Otherwise, we have $S(P(\uu))=\uu$ and $V(\uu)>1$. Now since also $b=1$ $(1,\uu)$ is not a self loop (Lemma \ref{lem:m2p-sl}). %and $S'(P'(b,\uu))\neq (b,\uu)$, we have that $(1,\uu)$ is not a selfloop. 
 Then it must be the case that $P'(1,\uu)=(1,P(\uu))$. However, $S'(1,P(\uu))\neq (1,\uu)$ even though $S(P(\uu))=\uu$. This happens only when $P(\uu)$ is a self loop because of $V(P(\uu))=0$ (third condition of $P'$).
-Therefore, we have $V(\uu)-V(P(\uu))>1$ implying that $\uu$ is a T3 type solution of $\CI$. 
+Therefore, we have $V(\uu)-V(P(\uu))>1$ implying that $\uu$ is a \ref{eoml:bad_potential} type solution of $\CI$. 
 \medskip
 
 \noindent{\em Case II.}
-Similarly, if $P'(S'(\xx))\neq \xx$, then either $\uu$ is a genuine end of a line of $\CI$, or there is some issue with the potential at $\uu$. If $P(S(\uu))\neq \uu$ then we get T1 solution of $\CI$. Otherwise, $P(S(\uu))=\uu$ and $V(\uu)>0$. Now as $(b,\uu)$ is not a self loop and $V(\uu)>0$, it must be the case that $S'(b,\uu)=(1,S(\uu))$. However, $P'(1, S(\uu))\neq (b,\uu)$ even though $P(S(\uu))=\uu$. This happens only when $S(\uu)$ is a self loop because of $V(S(\uu))=0$. Therefore, we get $V(S(\uu))-V(\uu)<0$, i.e., $\uu$ is a type T3 solution of $\CI$. 
+Similarly, if $P'(S'(\xx))\neq \xx$, then either $\uu$ is a genuine end of a line of $\CI$, or there is some issue with the potential at $\uu$. If $P(S(\uu))\neq \uu$ then we get \ref{eoml:eol} solution of $\CI$. Otherwise, $P(S(\uu))=\uu$ and $V(\uu)>0$. Now as $(b,\uu)$ is not a self loop and $V(\uu)>0$, it must be the case that $S'(b,\uu)=(1,S(\uu))$. However, $P'(1, S(\uu))\neq (b,\uu)$ even though $P(S(\uu))=\uu$. This happens only when $S(\uu)$ is a self loop because of $V(S(\uu))=0$. Therefore, we get $V(S(\uu))-V(\uu)<0$, i.e., $\uu$ is a type \ref{eoml:bad_potential} solution of $\CI$. 
 \end{proof}
 
 \begin{lemma}\label{lem:m2p-r2}
-Let $\xx=(b,\uu)\in \{0,1\}^k$ be an R2 type solution of the constructed \EOPL instance $\CI'$, then $\uu$ is a type T3 solution of \EOML instance~$\CI$.
+Let $\xx=(b,\uu)\in \{0,1\}^k$ be an \ref{eopl:bad_potential} type solution of the constructed \EOPL instance $\CI'$, then $\uu$ is a type \ref{eoml:bad_potential} solution of \EOML instance~$\CI$.
 \end{lemma}
 \begin{proof}
 Clearly, $\xx\neq 0^k$. Let $\yy = (b',\uu') = S'(\xx) \neq \xx$, and observe that $P(\yy) = \xx$. This also implies that $\yy$ is not a self loop, and hence $b=b'=1$ and $V(\uu)>0$ (Lemma \ref{lem:m2p-sl}). Further, $\yy = S'(1,\uu)=(1,S(\uu))$, hence $\uu'=S(\uu)$. Also, $V'(\xx)=V'(1,\uu)=V(\uu)$ and $V'(\yy)=V'(1,\uu')=V(\uu')$. 
 
-Since $V'(\yy)-V'(\xx)\le 0$ we get $V(\uu')-V(\uu)\le 0 \Rightarrow V(S(\uu)) - V(\uu) \le 0\Rightarrow V(S(\uu)) - V(\uu)\neq 1$. Given that $V(\uu)>0$, $\uu$ gives a type T3 solution of \EOML.
+Since $V'(\yy)-V'(\xx)\le 0$ we get $V(\uu')-V(\uu)\le 0 \Rightarrow V(S(\uu)) - V(\uu) \le 0\Rightarrow V(S(\uu)) - V(\uu)\neq 1$. Given that $V(\uu)>0$, $\uu$ gives a type \ref{eoml:bad_potential} solution of \EOML.
 \end{proof}
 
 \begin{theorem}\label{thm:m2p}
@@ -174,13 +174,13 @@ potentials are $p$ and $p'$ such that say $p<p'$ then we create edges $(u,p)\ra
 vertices, namely those that never appear on any edge due to irrelevant potential
 values, i.e., in this example $(u,\pi)$ with $\pi <p$ or $\pi\ge p'$. We make
 them self loops (not an end-of-line) with zero potential, and since
-non-end-of-line solutions of \EOML, namely $T2$ and $T3$, must have strictly
+non-end-of-line solutions of \EOML, namely \ref{eoml:other_start} and \ref{eoml:bad_potential}, must have strictly
 positive potential, these will never create a solution of the \EOML instance.
 
 A number of issues need to be handled with consistency: $(a)$
-a $T2$ type solution of \EOML may be neither at the end of any line nor be a 
+a \ref{eoml:other_start} type solution of \EOML may be neither at the end of any line nor be a 
 potential violation in \EOPL; we do extra (linear time) work to handle such
-solutions, $(b)$ a $T3$ type potential violation may not be on a ``valid'' edge as
+solutions, $(b)$ a \ref{eoml:bad_potential} type potential violation may not be on a ``valid'' edge as
 required by \EOPL. $(c)$ ``invalid'' edges, $(d)$ potential difference at the
 initial vertex $0^n$, etc.
 
@@ -353,10 +353,10 @@ The fact that procedures $S'$, $P'$ and $V'$ give a valid \EOML instance follows
 Procedures $S'$, $P'$ and $V'$ gives a valid \EOML instance on vertex set $\{0,1\}^k$, where $k=m+n$ and $V':\{0,1\}^k\ra \{0,\dots, 2^k-1\}$.
 \end{lemma}
 
-The next three lemmas shows how to construct a solution of \EOPL instance $\CI$ from a type T1, T2, or T3 solution of constructed \EOML instance $\CI'$.
-The basic idea for next lemma, which handles type T1 solutions, is that we never create spurious end or start of a path. 
+The next three lemmas shows how to construct a solution of \EOPL instance $\CI$ from a type \ref{eoml:eol}, \ref{eoml:other_start}, or \ref{eoml:bad_potential} solution of constructed \EOML instance $\CI'$.
+The basic idea for next lemma, which handles type \ref{eoml:eol} solutions, is that we never create spurious end or start of a path. 
 \begin{lemma}\label{lem:p2m-t1}
-Let $\xx=(\uu,\pi)$ be a type T1 solution of constructed \EOML instance $\CI'$. Then $\uu$ is a type R1 solution of the given \EOPL instance $\CI$.
+Let $\xx=(\uu,\pi)$ be a type \ref{eoml:eol} solution of constructed \EOML instance $\CI'$. Then $\uu$ is a type \ref{eopl:eol} solution of the given \EOPL instance $\CI$.
 \end{lemma}
 
 \begin{proof}
@@ -371,32 +371,32 @@ For the remaining cases, let $P'(S'(\xx))\neq \xx$, and let $\uu'=S(\uu)$. There
 Similar argument follows for the case when $S'(P'(\xx))\neq \xx$. 
 \end{proof}
 
-The basic idea behind the next lemma is that a T2 type solution in $\CI'$ has
+The basic idea behind the next lemma is that a \ref{eoml:other_start} type solution in $\CI'$ has
 potential $1$. Therefore, it is surely not a self loop. Then it is either an end of a path or near an end of a path, or else near a potential violation. 
 
 \begin{lemma}\label{lem:p2m-t2}
-Let $\xx=(\uu,\pi)$ be a type T2 solution of $\CI'$. Either $\uu \neq 0^n$ is start of a path in $\CI$ (type R1 solution), or $P(\uu)$ is an R1 or R2 type solution in $\CI$, or $P(P(\uu))$ is an R2 type solution in $\CI$.
+Let $\xx=(\uu,\pi)$ be a type \ref{eoml:other_start} solution of $\CI'$. Either $\uu \neq 0^n$ is start of a path in $\CI$ (type \ref{eopl:eol} solution), or $P(\uu)$ is an \ref{eopl:eol} or \ref{eopl:bad_potential} type solution in $\CI$, or $P(P(\uu))$ is an \ref{eopl:bad_potential} type solution in $\CI$.
 \end{lemma}
 
 \begin{proof}
 Clearly $\uu \neq 0^n$, and $\xx$ is not a self loop, i.e., it is not a dummy vertex with irrelevant value of $\pi$. Further, $\pi=1$. If $\uu$ is a start or end of a path in $\CI$ then done. 
 
-Otherwise, if $V(P(\uu))>\pi$ then we have $V(\uu)\le \pi$ and hence $V(\uu)-V(P(\uu))\le 0$ giving $P(\uu)$ as an R2 type solution of $\CI$. 
-If $V(P(\uu))<\pi=1$ then $V(P(\uu))=0$. Since potential can not go below zero, either $P(\uu)$ is an end of a path, or for $\uu''=P(P(\uu))$ and $\uu'=P(\uu)$ we have $\uu'=S(\uu'')$ and $V(\uu')-V(\uu'')\le 0$, giving $\uu''$ as a type R2 solution of $\CI$.
+Otherwise, if $V(P(\uu))>\pi$ then we have $V(\uu)\le \pi$ and hence $V(\uu)-V(P(\uu))\le 0$ giving $P(\uu)$ as an \ref{eopl:bad_potential} type solution of $\CI$. 
+If $V(P(\uu))<\pi=1$ then $V(P(\uu))=0$. Since potential can not go below zero, either $P(\uu)$ is an end of a path, or for $\uu''=P(P(\uu))$ and $\uu'=P(\uu)$ we have $\uu'=S(\uu'')$ and $V(\uu')-V(\uu'')\le 0$, giving $\uu''$ as a type \ref{eopl:bad_potential} solution of $\CI$.
 \end{proof}
 
-At a type T3 solution of $\CI'$ potential is strictly positive, hence these solutions are not self loops. If they correspond to potential violation in $\CI$ then we get a type R2 solution. But this may not be the case, if we made $S'$ or $P'$ self pointing due to end or start of a path respectively. In that case, we get a type R1 solution. The next lemma formalizes this intuition. 
+At a type \ref{eoml:bad_potential} solution of $\CI'$ potential is strictly positive, hence these solutions are not self loops. If they correspond to potential violation in $\CI$ then we get a type \ref{eopl:bad_potential} solution. But this may not be the case, if we made $S'$ or $P'$ self pointing due to end or start of a path respectively. In that case, we get a type \ref{eopl:eol} solution. The next lemma formalizes this intuition. 
 
 \begin{lemma}\label{lem:p2m-t3}
-Let $\xx=(\uu,\pi)$ be a type T3 solution of $\CI'$. If $\xx$ is a start or end of a path in $\CI'$ then $\uu$ gives a type R1 solution in $\CI$. Otherwise $\uu$ gives a type R2 solution of $\CI$.
+Let $\xx=(\uu,\pi)$ be a type \ref{eoml:bad_potential} solution of $\CI'$. If $\xx$ is a start or end of a path in $\CI'$ then $\uu$ gives a type \ref{eopl:eol} solution in $\CI$. Otherwise $\uu$ gives a type \ref{eopl:bad_potential} solution of $\CI$.
 \end{lemma}
 
 \begin{proof}
-Since $V'(\xx)>0$, it is not a self loop and hence is not dummy, and $\uu\neq 0^n$. If $\uu$ is start or end of a path then $\uu$ is a type R1 solution of $\CI$. Otherwise, there are valid incoming and outgoing edges at $\uu$, therefore so at $\xx$. 
+Since $V'(\xx)>0$, it is not a self loop and hence is not dummy, and $\uu\neq 0^n$. If $\uu$ is start or end of a path then $\uu$ is a type \ref{eopl:eol} solution of $\CI$. Otherwise, there are valid incoming and outgoing edges at $\uu$, therefore so at $\xx$. 
 
-If $V((S(\xx))-V(\xx)\neq 1$, then since potential either remains the same or increases or decreases exactly by one on edges of $\CI'$, it must be the case that $V(S(\xx))-V(\xx)\le 0$. This is possible only when $V(S(\uu))\le V(\uu)$. Since $\uu$ is not an end of a path we do have $S(\uu)\neq \uu$ and $P(S(\uu))=\uu$. Thus, $\uu$ is a type T2 solution of $\CI$.
+If $V((S(\xx))-V(\xx)\neq 1$, then since potential either remains the same or increases or decreases exactly by one on edges of $\CI'$, it must be the case that $V(S(\xx))-V(\xx)\le 0$. This is possible only when $V(S(\uu))\le V(\uu)$. Since $\uu$ is not an end of a path we do have $S(\uu)\neq \uu$ and $P(S(\uu))=\uu$. Thus, $\uu$ is a type \ref{eoml:other_start} solution of $\CI$.
 
-If $V((\xx)-V(P(\xx))\neq 1$, then by the same argument we get that for $(\uu'',\pi'')=P(\uu)$, $\uu''$ is a type R2 solution of $\CI$. 
+If $V((\xx)-V(P(\xx))\neq 1$, then by the same argument we get that for $(\uu'',\pi'')=P(\uu)$, $\uu''$ is a type \ref{eopl:bad_potential} solution of $\CI$. 
 \end{proof}
 
 Our main theorem follows using Lemmas \ref{lem:p2m-valid}, \ref{lem:p2m-t1}, \ref{lem:p2m-t2}, and \ref{lem:p2m-t3}.
